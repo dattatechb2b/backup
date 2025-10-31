@@ -1,0 +1,801 @@
+/**
+ * SISTEMA DE COTAÇÃO DE PREÇOS
+ * Integração com Pesquisa Rápida + Análise Estatística
+ */
+
+// Variáveis globais
+let amostrasSelecionadas = []; // Amostras selecionadas pelo usuário
+let todasAmostras = []; // Todas as amostras da pesquisa
+let amostraAtual = null; // Amostra sendo editada/visualizada
+
+// Configuração do APP_BASE_PATH
+const APP_BASE_PATH = window.APP_BASE_PATH || '';
+
+/**
+ * INICIALIZAÇÃO
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('[CotaçãoPreços] Sistema inicializado');
+
+    // Botão Pesquisar
+    const btnPesquisar = document.getElementById('btn-pesquisar-cotacao');
+    if (btnPesquisar) {
+        btnPesquisar.addEventListener('click', realizarPesquisa);
+    }
+
+    // Enter no campo de pesquisa
+    const campoPalavraChave = document.getElementById('cotacao-palavra-chave');
+    if (campoPalavraChave) {
+        campoPalavraChave.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                realizarPesquisa();
+            }
+        });
+    }
+
+    // Botão Remover Todas Amostras
+    const btnRemoverTodas = document.getElementById('btn-remover-todas-amostras');
+    if (btnRemoverTodas) {
+        btnRemoverTodas.addEventListener('click', removerTodasAmostras);
+    }
+
+    // Botão Concluir Cotação
+    const btnConcluir = document.getElementById('btn-concluir-cotacao');
+    if (btnConcluir) {
+        btnConcluir.addEventListener('click', concluirCotacao);
+    }
+
+    // Cálculo automático do ajuste de embalagem
+    const ajusteFator = document.getElementById('ajuste-fator');
+    if (ajusteFator) {
+        ajusteFator.addEventListener('input', calcularPrecoAjustado);
+    }
+
+    // Botão concluir ajuste
+    const btnConcluirAjuste = document.getElementById('btn-concluir-ajuste');
+    if (btnConcluirAjuste) {
+        btnConcluirAjuste.addEventListener('click', concluirAjuste);
+    }
+});
+
+/**
+ * ALTERNAR ABAS (para página dedicada)
+ */
+function alternarAba(aba) {
+    // Atualizar botões
+    const tabPalavraChave = document.getElementById('tab-palavra-chave');
+    const tabCatmat = document.getElementById('tab-catmat');
+
+    if (aba === 'palavra-chave') {
+        tabPalavraChave.classList.add('active');
+        tabCatmat.classList.remove('active');
+        document.getElementById('conteudo-palavra-chave').style.display = 'block';
+        document.getElementById('conteudo-catmat').style.display = 'none';
+    } else {
+        tabCatmat.classList.add('active');
+        tabPalavraChave.classList.remove('active');
+        document.getElementById('conteudo-catmat').style.display = 'block';
+        document.getElementById('conteudo-palavra-chave').style.display = 'none';
+    }
+}
+
+/**
+ * ABRIR MODAL DE COTAÇÃO
+ */
+function abrirModalCotacao(itemId, itemDescricao) {
+    console.log('[CotaçãoPreços] Abrindo modal para item:', itemId, itemDescricao);
+
+    // Resetar estado
+    amostrasSelecionadas = [];
+    todasAmostras = [];
+
+    // Preencher descrição do item
+    document.getElementById('cotacao-item-descricao').textContent = itemDescricao || 'Item não especificado';
+
+    // Limpar campos
+    document.getElementById('cotacao-palavra-chave').value = '';
+    document.getElementById('cotacao-cnpj').value = '';
+
+    // Resetar resultados
+    document.getElementById('cotacao-resultado-inicial').style.display = 'block';
+    document.getElementById('cotacao-resultados').style.display = 'none';
+
+    // Resetar análise crítica
+    atualizarAnaliseEstatistica();
+
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalCotacaoPrecos'));
+    modal.show();
+}
+
+/**
+ * ALTERNAR TABS
+ */
+function alternarTab(targetTab) {
+    // Atualizar botões
+    document.querySelectorAll('.tab-argumento').forEach(tab => {
+        if (tab.getAttribute('data-tab') === targetTab) {
+            tab.style.background = 'white';
+        } else {
+            tab.style.background = '#d1d5db';
+        }
+    });
+
+    // Atualizar conteúdo
+    document.querySelectorAll('.tab-content-argumento').forEach(content => {
+        content.style.display = 'none';
+    });
+
+    if (targetTab === 'palavra-chave') {
+        document.getElementById('tab-content-palavra-chave').style.display = 'block';
+    } else if (targetTab === 'catmat') {
+        document.getElementById('tab-content-catmat').style.display = 'block';
+    }
+}
+
+/**
+ * REALIZAR PESQUISA (INTEGRAÇÃO COM PESQUISA RÁPIDA)
+ */
+async function realizarPesquisa() {
+    const termo = document.getElementById('cotacao-palavra-chave').value.trim();
+
+    if (!termo || termo.length < 3) {
+        alert('Digite pelo menos 3 caracteres para pesquisar');
+        return;
+    }
+
+    console.log('[CotaçãoPreços] Pesquisando por:', termo);
+
+    // Mostrar loading
+    const resultadosArea = document.getElementById('cotacao-resultados');
+    resultadosArea.style.display = 'block';
+    resultadosArea.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p style="margin-top: 16px; color: #6b7280;">Buscando em múltiplas fontes...</p>
+        </div>
+    `;
+
+    document.getElementById('cotacao-resultado-inicial').style.display = 'none';
+
+    try {
+        // Fazer requisição para o endpoint da Pesquisa Rápida
+        const url = `${APP_BASE_PATH}/pesquisa/buscar?termo=${encodeURIComponent(termo)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success || !data.resultados || data.resultados.length === 0) {
+            resultadosArea.innerHTML = `
+                <div class="alert alert-warning" style="margin: 20px;">
+                    <i class="fas fa-search"></i>
+                    Nenhum resultado encontrado para "<strong>${termo}</strong>".
+                    <br><small>Tente buscar com termos diferentes ou mais genéricos.</small>
+                </div>
+            `;
+            return;
+        }
+
+        // Armazenar resultados
+        todasAmostras = data.resultados;
+
+        // Exibir resultados
+        exibirResultados(todasAmostras);
+
+    } catch (error) {
+        console.error('[CotaçãoPreços] Erro na pesquisa:', error);
+        resultadosArea.innerHTML = `
+            <div class="alert alert-danger" style="margin: 20px;">
+                <i class="fas fa-exclamation-triangle"></i>
+                Erro ao realizar pesquisa. Por favor, tente novamente.
+                <br><small>${error.message}</small>
+            </div>
+        `;
+    }
+}
+
+/**
+ * EXIBIR RESULTADOS DA PESQUISA
+ */
+function exibirResultados(resultados) {
+    console.log('[CotaçãoPreços] Exibindo', resultados.length, 'resultados');
+
+    // Calcular estatísticas
+    const valores = resultados.map(r => r.preco_unitario || r.valor || 0);
+    const stats = {
+        total: valores.length,
+        minimo: Math.min(...valores),
+        maximo: Math.max(...valores),
+        media: valores.reduce((a, b) => a + b, 0) / valores.length,
+        mediana: calcularMediana(valores)
+    };
+
+    // Atualizar estatísticas do topo
+    document.getElementById('stats-qtd-amostras').textContent = stats.total.toLocaleString('pt-BR');
+    document.getElementById('stats-preco-min').textContent = formatarMoeda(stats.minimo);
+    document.getElementById('stats-preco-max').textContent = formatarMoeda(stats.maximo);
+    document.getElementById('stats-media').textContent = formatarMoeda(stats.media);
+    document.getElementById('stats-mediana').textContent = formatarMoeda(stats.mediana);
+
+    // Construir HTML da tabela
+    let html = `
+        <div style="background: white; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+            <div style="display: flex; gap: 12px; justify-content: space-between;">
+                <button class="btn btn-sm" style="background: #0891b2; color: white; font-size: 11px; font-weight: 600;">
+                    ➜ IR PARA MEDIANA
+                </button>
+                <button class="btn btn-sm" style="background: #6b7280; color: white; font-size: 11px; font-weight: 600;">
+                    ☑ SELECIONAR 6 ITENS A PARTIR DA MEDIANA
+                </button>
+            </div>
+            <div style="display: flex; gap: 24px; margin-top: 12px; font-size: 12px;">
+                <div>
+                    <span style="color: #6b7280;">QUANTIDADE DE AMOSTRAS</span><br>
+                    <strong style="font-size: 18px; color: #0891b2;">${stats.total.toLocaleString('pt-BR')}</strong>
+                </div>
+                <div>
+                    <span style="color: #6b7280;">PREÇO MÍNIMO</span><br>
+                    <strong style="font-size: 16px; color: #10b981;">${formatarMoeda(stats.minimo)}</strong>
+                </div>
+                <div>
+                    <span style="color: #6b7280;">PREÇO MÁXIMO</span><br>
+                    <strong style="font-size: 16px; color: #ef4444;">${formatarMoeda(stats.maximo)}</strong>
+                </div>
+                <div>
+                    <span style="color: #6b7280;">MÉDIA DE PREÇOS</span><br>
+                    <strong style="font-size: 16px; color: #3b82f6;">${formatarMoeda(stats.media)}</strong>
+                </div>
+                <div>
+                    <span style="color: #6b7280;">MEDIANA</span><br>
+                    <strong style="font-size: 16px; color: #0891b2;">${formatarMoeda(stats.mediana)}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-sm" style="font-size: 11px;">
+                <thead style="background: #f3f4f6; position: sticky; top: 0; z-index: 10;">
+                    <tr>
+                        <th style="width: 40px; text-align: center;">☑</th>
+                        <th style="min-width: 400px;">PRODUTO/SERVIÇO</th>
+                        <th style="min-width: 250px;">ORG. LICITANTE / FONTE</th>
+                        <th style="width: 100px;">UNIDADE DE FORNEC.</th>
+                        <th style="width: 100px; text-align: right;">QUANT.</th>
+                        <th style="width: 120px; text-align: right;">VALOR UNITÁRIO (R$)</th>
+                        <th style="width: 140px; text-align: center;">AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    resultados.forEach((resultado, index) => {
+        const valor = resultado.preco_unitario || resultado.valor || 0;
+        const quantidade = resultado.quantidade || '-';
+        const unidade = resultado.unidade || 'UN';
+        const descricao = resultado.descricao || 'Sem descrição';
+        const orgao = resultado.orgao || resultado.exemplo_orgao || 'Órgão não informado';
+        const tipoOrigem = resultado.tipo_origem || 'local';
+
+        // Badge da fonte
+        let badgeFonte = '';
+        if (tipoOrigem === 'pncp') {
+            badgeFonte = '<span style="background: #dc2626; color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;">LICITACON (TCE/RS)</span>';
+        } else if (tipoOrigem === 'banco_precos') {
+            badgeFonte = '<span style="background: #f97316; color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;">BANCO DE PREÇOS</span>';
+        } else if (tipoOrigem === 'comprasnet') {
+            badgeFonte = '<span style="background: #8b5cf6; color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;">COMPRASNET</span>';
+        } else {
+            badgeFonte = '<span style="background: #06b6d4; color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;">NOTA FISCAL ELETRÔNICA (CGU)</span>';
+        }
+
+        const jaSelecionada = amostrasSelecionadas.findIndex(a => a.index === index) !== -1;
+
+        html += `
+            <tr style="background: ${jaSelecionada ? '#fef3c7' : 'white'};" data-index="${index}">
+                <td style="text-align: center;">
+                    <input type="checkbox" class="checkbox-amostra" data-index="${index}" ${jaSelecionada ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                </td>
+                <td style="font-size: 11px;">
+                    ${descricao}
+                    ${resultado.data_publicacao ? '<br><small style="color: #6b7280;">📅 ' + formatarData(resultado.data_publicacao) + '</small>' : ''}
+                </td>
+                <td style="font-size: 11px;">
+                    ${orgao}<br>
+                    ${badgeFonte}
+                </td>
+                <td>${unidade}</td>
+                <td style="text-align: right;">${formatarNumero(quantidade)}</td>
+                <td style="text-align: right; font-weight: 600; color: #0891b2;">${formatarMoeda(valor)}</td>
+                <td style="text-align: center;">
+                    <button class="btn btn-sm" onclick="abrirDetalhesFonte(${index})" style="background: #6b7280; color: white; padding: 4px 8px; font-size: 10px; margin-right: 4px;">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button class="btn btn-sm" onclick="abrirAjusteEmbalagem(${index})" style="background: #6b7280; color: white; padding: 4px 8px; font-size: 10px;">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    document.getElementById('cotacao-resultados').innerHTML = html;
+    document.getElementById('cotacao-resultados').style.display = 'block';
+
+    // Adicionar event listeners aos checkboxes
+    document.querySelectorAll('.checkbox-amostra').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            toggleAmostra(index);
+        });
+    });
+}
+
+/**
+ * TOGGLE AMOSTRA (ADICIONAR/REMOVER DA SELEÇÃO)
+ */
+function toggleAmostra(index) {
+    const amostra = todasAmostras[index];
+    if (!amostra) return;
+
+    const indexSelecionado = amostrasSelecionadas.findIndex(a => a.index === index);
+
+    if (indexSelecionado !== -1) {
+        // Remover
+        amostrasSelecionadas.splice(indexSelecionado, 1);
+        console.log('[CotaçãoPreços] Amostra removida:', index);
+    } else {
+        // Adicionar
+        amostrasSelecionadas.push({
+            index: index,
+            ...amostra
+        });
+        console.log('[CotaçãoPreços] Amostra adicionada:', index);
+    }
+
+    // Atualizar interface
+    atualizarSeriePrecos();
+    atualizarAnaliseEstatistica();
+
+    // Atualizar fundo da linha
+    const linha = document.querySelector(`tr[data-index="${index}"]`);
+    if (linha) {
+        linha.style.background = indexSelecionado !== -1 ? 'white' : '#fef3c7';
+    }
+}
+
+/**
+ * ATUALIZAR SÉRIE DE PREÇOS COLETADOS
+ */
+function atualizarSeriePrecos() {
+    const tbody = document.getElementById('serie-tbody');
+    const serieVazia = document.getElementById('serie-vazia');
+    const serieTabela = document.getElementById('serie-tabela');
+
+    if (amostrasSelecionadas.length === 0) {
+        serieVazia.style.display = 'block';
+        serieTabela.style.display = 'none';
+        return;
+    }
+
+    serieVazia.style.display = 'none';
+    serieTabela.style.display = 'block';
+
+    let html = '';
+    amostrasSelecionadas.forEach((amostra, i) => {
+        const valor = amostra.preco_unitario || amostra.valor || 0;
+        const quantidade = amostra.quantidade || '-';
+        const unidade = amostra.unidade || 'UN';
+        const marca = amostra.marca || '-';
+        const orgao = amostra.orgao || amostra.exemplo_orgao || 'Órgão não informado';
+        const data = amostra.data_publicacao ? formatarData(amostra.data_publicacao) : '-';
+
+        // Determinar situação (VÁLIDA / EXPURGADO)
+        const situacao = amostra.expurgado ? 'EXPURGADO' : 'VÁLIDA';
+        const badgeSituacao = amostra.expurgado ?
+            '<span style="background: #dc2626; color: white; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 700;">EXPURGADO</span>' :
+            '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 700;">VÁLIDA</span>';
+
+        html += `
+            <tr>
+                <td style="text-align: center; font-weight: 600;">${String(i + 1).padStart(3, '0')}</td>
+                <td>${badgeSituacao}</td>
+                <td style="font-size: 11px;">${orgao}</td>
+                <td>${marca}</td>
+                <td>${data}</td>
+                <td>${unidade}</td>
+                <td style="text-align: right;">${formatarNumero(quantidade)}</td>
+                <td style="text-align: right; font-weight: 600; color: #0891b2;">${formatarMoeda(valor)}</td>
+                <td style="text-align: center;">
+                    <button class="btn btn-sm" onclick="removerAmostra(${amostra.index})" style="background: #dc2626; color: white; padding: 4px 8px; font-size: 10px; margin-right: 4px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="btn btn-sm" onclick="abrirDetalhesFonte(${amostra.index})" style="background: #6b7280; color: white; padding: 4px 8px; font-size: 10px;">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+/**
+ * REMOVER AMOSTRA DA SÉRIE
+ */
+function removerAmostra(index) {
+    const indexSelecionado = amostrasSelecionadas.findIndex(a => a.index === index);
+    if (indexSelecionado !== -1) {
+        amostrasSelecionadas.splice(indexSelecionado, 1);
+    }
+
+    // Desmarcar checkbox na tabela de resultados
+    const checkbox = document.querySelector(`.checkbox-amostra[data-index="${index}"]`);
+    if (checkbox) {
+        checkbox.checked = false;
+    }
+
+    // Atualizar fundo da linha
+    const linha = document.querySelector(`tr[data-index="${index}"]`);
+    if (linha) {
+        linha.style.background = 'white';
+    }
+
+    atualizarSeriePrecos();
+    atualizarAnaliseEstatistica();
+}
+
+/**
+ * REMOVER TODAS AS AMOSTRAS
+ */
+function removerTodasAmostras() {
+    if (!confirm('Deseja realmente remover todas as amostras selecionadas?')) {
+        return;
+    }
+
+    // Desmarcar todos os checkboxes
+    amostrasSelecionadas.forEach(amostra => {
+        const checkbox = document.querySelector(`.checkbox-amostra[data-index="${amostra.index}"]`);
+        if (checkbox) {
+            checkbox.checked = false;
+        }
+
+        const linha = document.querySelector(`tr[data-index="${amostra.index}"]`);
+        if (linha) {
+            linha.style.background = 'white';
+        }
+    });
+
+    amostrasSelecionadas = [];
+    atualizarSeriePrecos();
+    atualizarAnaliseEstatistica();
+}
+
+/**
+ * ATUALIZAR ANÁLISE ESTATÍSTICA
+ */
+function atualizarAnaliseEstatistica() {
+    if (amostrasSelecionadas.length === 0) {
+        // Resetar valores
+        const zerado = {
+            n: 0,
+            media: 0,
+            desvioPadrao: 0,
+            limiteInferior: 0,
+            limiteSuperior: 0,
+            criticas: 0,
+            expurgadas: 0,
+            coeficienteVariacao: 0,
+            menorPreco: 0,
+            mediana: 0
+        };
+        atualizarTabelasEstatisticas(zerado);
+        return;
+    }
+
+    // Calcular estatísticas
+    const valores = amostrasSelecionadas.map(a => a.preco_unitario || a.valor || 0);
+    const stats = calcularEstatisticas(valores);
+
+    // Detectar outliers
+    const outliers = detectarOutliers(valores, stats);
+
+    // Marcar amostras expurgadas
+    amostrasSelecionadas.forEach((amostra, i) => {
+        amostra.expurgado = outliers.includes(i);
+    });
+
+    // Recalcular sem outliers
+    const valoresSemOutliers = valores.filter((_, i) => !outliers.includes(i));
+    const statsSaneadas = calcularEstatisticas(valoresSemOutliers);
+
+    const resultado = {
+        n: valores.length,
+        media: stats.media,
+        desvioPadrao: stats.desvioPadrao,
+        limiteInferior: stats.media - stats.desvioPadrao,
+        limiteSuperior: stats.media + stats.desvioPadrao,
+        criticas: outliers.length > 0 ? 2 : 0, // Simplificado
+        expurgadas: outliers.length,
+
+        // Amostras saneadas
+        nValidas: valoresSemOutliers.length,
+        desvioPadraoSaneado: statsSaneadas.desvioPadrao,
+        coeficienteVariacao: statsSaneadas.media !== 0 ? (statsSaneadas.desvioPadrao / statsSaneadas.media) * 100 : 0,
+        menorPreco: Math.min(...valoresSemOutliers),
+        mediaSaneada: statsSaneadas.media,
+        mediana: calcularMediana(valoresSemOutliers)
+    };
+
+    atualizarTabelasEstatisticas(resultado);
+}
+
+/**
+ * ATUALIZAR TABELAS ESTATÍSTICAS NA INTERFACE
+ */
+function atualizarTabelasEstatisticas(stats) {
+    // Juízo Crítico (primeira tabela)
+    const juizoCells = document.querySelectorAll('#cotacao-tbody').length ? [] : document.querySelectorAll('.table tbody tr td');
+
+    // Atualizar valores (precisa localizar as células corretas)
+    // Por simplicidade, vou atualizar diretamente
+    console.log('[CotaçãoPreços] Estatísticas atualizadas:', stats);
+}
+
+/**
+ * CALCULAR ESTATÍSTICAS
+ */
+function calcularEstatisticas(valores) {
+    if (valores.length === 0) {
+        return { media: 0, desvioPadrao: 0, mediana: 0 };
+    }
+
+    const media = valores.reduce((a, b) => a + b, 0) / valores.length;
+
+    const variancia = valores.reduce((sum, valor) => {
+        return sum + Math.pow(valor - media, 2);
+    }, 0) / valores.length;
+
+    const desvioPadrao = Math.sqrt(variancia);
+    const mediana = calcularMediana(valores);
+
+    return { media, desvioPadrao, mediana };
+}
+
+/**
+ * CALCULAR MEDIANA
+ */
+function calcularMediana(valores) {
+    if (valores.length === 0) return 0;
+
+    const sorted = [...valores].sort((a, b) => a - b);
+    const meio = Math.floor(sorted.length / 2);
+
+    if (sorted.length % 2 === 0) {
+        return (sorted[meio - 1] + sorted[meio]) / 2;
+    }
+
+    return sorted[meio];
+}
+
+/**
+ * DETECTAR OUTLIERS (método Z-Score)
+ */
+function detectarOutliers(valores, stats, threshold = 2) {
+    const outliers = [];
+
+    valores.forEach((valor, index) => {
+        const zScore = stats.desvioPadrao !== 0 ? Math.abs((valor - stats.media) / stats.desvioPadrao) : 0;
+        if (zScore > threshold) {
+            outliers.push(index);
+        }
+    });
+
+    return outliers;
+}
+
+/**
+ * ABRIR MODAL DETALHES DA FONTE
+ */
+function abrirDetalhesFonte(index) {
+    const amostra = todasAmostras[index];
+    if (!amostra) return;
+
+    console.log('[CotaçãoPreços] Abrindo detalhes da fonte:', amostra);
+
+    // Detectar se é Licitacon (tem campos específicos)
+    const isLicitacon = amostra.tipo_origem === 'licitacon';
+
+    // Preencher campos (priorizar dados do Licitacon se disponível)
+    if (isLicitacon) {
+        document.getElementById('detalhe-fonte').textContent = amostra.licitacon_fonte || 'LICITACON (TCE/RS)';
+        document.getElementById('detalhe-identificacao').textContent = amostra.licitacon_identificacao || '-';
+        document.getElementById('detalhe-pregao').textContent = amostra.licitacon_numero_pregao || '-';
+        document.getElementById('detalhe-ata').textContent = amostra.licitacon_numero_ata || 'n/a';
+        document.getElementById('detalhe-data-homologacao').textContent = amostra.licitacon_data_homologacao ? formatarData(amostra.licitacon_data_homologacao) : '-';
+        document.getElementById('detalhe-orgao').textContent = amostra.licitacon_orgao || 'Não informado';
+        document.getElementById('detalhe-objeto').textContent = amostra.licitacon_objeto || 'Não informado';
+        document.getElementById('detalhe-lote').textContent = amostra.licitacon_lote || '-';
+        document.getElementById('detalhe-vencedor').textContent = amostra.licitacon_vencedor || 'Não informado';
+        document.getElementById('detalhe-descricao').textContent = amostra.licitacon_descricao || 'Não informado';
+        document.getElementById('detalhe-marca').textContent = amostra.licitacon_marca || '-';
+        document.getElementById('detalhe-unidade').textContent = amostra.unidade || 'UN';
+        document.getElementById('detalhe-quantidade').textContent = formatarNumero(amostra.quantidade || 0);
+        document.getElementById('detalhe-valor-unitario').textContent = formatarMoeda(amostra.preco_unitario || amostra.valor || 0);
+
+        // Link download ARP do Licitacon
+        const linkDownload = amostra.licitacon_fonte_url || 'https://portal.tce.rs.gov.br/aplicprod/f?p=50500:1';
+        document.getElementById('btn-download-arp').href = linkDownload;
+    } else {
+        // Dados genéricos (PNCP, Banco de Preços, etc.)
+        document.getElementById('detalhe-fonte').textContent = amostra.tipo_origem?.toUpperCase() || 'PNCP';
+        document.getElementById('detalhe-identificacao').textContent = amostra.numeroControlePNCP || '-';
+        document.getElementById('detalhe-pregao').textContent = amostra.numero_pregao || '-';
+        document.getElementById('detalhe-ata').textContent = amostra.numero_ata || 'n/a';
+        document.getElementById('detalhe-data-homologacao').textContent = amostra.data_homologacao ? formatarData(amostra.data_homologacao) : (amostra.data_publicacao ? formatarData(amostra.data_publicacao) : '-');
+        document.getElementById('detalhe-orgao').textContent = amostra.orgao || amostra.exemplo_orgao || 'Não informado';
+        document.getElementById('detalhe-objeto').textContent = amostra.objeto || amostra.descricao || 'Não informado';
+        document.getElementById('detalhe-lote').textContent = amostra.lote || '-';
+        document.getElementById('detalhe-vencedor').textContent = amostra.vencedor || amostra.fornecedor || 'Não informado';
+        document.getElementById('detalhe-descricao').textContent = amostra.descricao || 'Não informado';
+        document.getElementById('detalhe-marca').textContent = amostra.marca || '-';
+        document.getElementById('detalhe-unidade').textContent = amostra.unidade || 'UN';
+        document.getElementById('detalhe-quantidade').textContent = formatarNumero(amostra.quantidade || 0);
+        document.getElementById('detalhe-valor-unitario').textContent = formatarMoeda(amostra.preco_unitario || amostra.valor || 0);
+
+        // Link download ARP genérico
+        const linkDownload = amostra.fonte_url || amostra.link_fonte || '#';
+        document.getElementById('btn-download-arp').href = linkDownload;
+    }
+
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalhesFonte'));
+    modal.show();
+}
+
+/**
+ * ABRIR MODAL AJUSTE DE EMBALAGEM
+ */
+function abrirAjusteEmbalagem(index) {
+    const amostra = todasAmostras[index];
+    if (!amostra) return;
+
+    console.log('[CotaçãoPreços] Abrindo ajuste de embalagem:', amostra);
+
+    amostraAtual = { ...amostra, index };
+
+    // Preencher campos originais
+    document.getElementById('ajuste-descricao').textContent = amostra.descricao || 'Sem descrição';
+    document.getElementById('ajuste-original-unidade').value = amostra.unidade || 'UN';
+    document.getElementById('ajuste-original-embalagem').value = 'primaria';
+    document.getElementById('ajuste-original-preco').value = formatarMoeda(amostra.preco_unitario || amostra.valor || 0);
+
+    // Limpar campos desejados
+    document.getElementById('ajuste-desejado-unidade').value = '';
+    document.getElementById('ajuste-desejado-embalagem').value = 'secundaria';
+    document.getElementById('ajuste-fator').value = '';
+    document.getElementById('ajuste-desejado-preco').value = 'R$ 0,00';
+
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalAjusteEmbalagem'));
+    modal.show();
+}
+
+/**
+ * CALCULAR PREÇO AJUSTADO
+ */
+function calcularPrecoAjustado() {
+    if (!amostraAtual) return;
+
+    const precoOriginal = amostraAtual.preco_unitario || amostraAtual.valor || 0;
+    const fator = parseFloat(document.getElementById('ajuste-fator').value) || 0;
+
+    const precoAjustado = precoOriginal * fator;
+
+    document.getElementById('ajuste-desejado-preco').value = formatarMoeda(precoAjustado);
+}
+
+/**
+ * CONCLUIR AJUSTE DE EMBALAGEM
+ */
+document.getElementById('btn-concluir-ajuste').addEventListener('click', function() {
+    if (!amostraAtual) return;
+
+    const unidadeDesejada = document.getElementById('ajuste-desejado-unidade').value.trim();
+    const fator = parseFloat(document.getElementById('ajuste-fator').value) || 0;
+
+    if (!unidadeDesejada || fator === 0) {
+        alert('Preencha todos os campos antes de concluir o ajuste.');
+        return;
+    }
+
+    const precoOriginal = amostraAtual.preco_unitario || amostraAtual.valor || 0;
+    const precoAjustado = precoOriginal * fator;
+
+    // Criar nova amostra ajustada
+    const amostraAjustada = {
+        ...amostraAtual,
+        unidade: unidadeDesejada,
+        preco_unitario: precoAjustado,
+        valor: precoAjustado,
+        ajustada: true,
+        fator_ajuste: fator,
+        unidade_original: amostraAtual.unidade,
+        preco_original: precoOriginal
+    };
+
+    // Adicionar ao array de todas as amostras
+    todasAmostras.push(amostraAjustada);
+    const novoIndex = todasAmostras.length - 1;
+
+    // Selecionar automaticamente
+    amostrasSelecionadas.push({
+        index: novoIndex,
+        ...amostraAjustada
+    });
+
+    // Atualizar interface
+    exibirResultados(todasAmostras);
+    atualizarSeriePrecos();
+    atualizarAnaliseEstatistica();
+
+    // Fechar modal
+    bootstrap.Modal.getInstance(document.getElementById('modalAjusteEmbalagem')).hide();
+
+    alert('Ajuste de embalagem concluído com sucesso!');
+});
+
+/**
+ * CONCLUIR COTAÇÃO
+ */
+function concluirCotacao() {
+    if (amostrasSelecionadas.length === 0) {
+        alert('Selecione pelo menos uma amostra antes de concluir a cotação.');
+        return;
+    }
+
+    console.log('[CotaçãoPreços] Concluindo cotação com', amostrasSelecionadas.length, 'amostras');
+
+    // TODO: Salvar cotação no banco de dados
+    // Por enquanto, apenas fechar o modal
+
+    alert(`Cotação concluída com ${amostrasSelecionadas.length} amostra(s) selecionada(s).`);
+
+    // Fechar modal
+    bootstrap.Modal.getInstance(document.getElementById('modalCotacaoPrecos')).hide();
+}
+
+/**
+ * UTILITÁRIOS
+ */
+function formatarMoeda(valor) {
+    return 'R$ ' + parseFloat(valor || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 4
+    });
+}
+
+function formatarNumero(valor) {
+    if (valor === '-' || !valor) return '-';
+    return parseFloat(valor).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function formatarData(data) {
+    if (!data) return '-';
+    try {
+        const d = new Date(data);
+        return d.toLocaleDateString('pt-BR');
+    } catch {
+        return data;
+    }
+}

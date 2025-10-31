@@ -1,0 +1,191 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                     MAPA VISUAL DOS ERROS ENCONTRADOS                          ║
+║                                                                                ║
+║                     Arquivo: elaborar.blade.php                               ║
+║                     Total de linhas: 12019                                    ║
+║                     Blocos <script>: 25                                       ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+RESUMO GRAFICAL
+═══════════════
+
+    Script Blocks:  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19-25
+                    ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✗  ✓  ✓  ✗  ✗  ✓
+
+
+DETALHAMENTO DOS ERROS
+═══════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ BLOCO 14: Linhas 6408-7038                                           [ERRO 1]│
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Estrutura:                                                                │
+│  ───────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  window.addEventListenerUnico(document, 'DOMContentLoaded', function() {   │
+│      ├─ console.log('[ELABORAR] DOMContentLoaded disparado!');             │
+│      ├─ if (typeof bootstrap === 'undefined') { ... }                      │
+│      │                                                                     │
+│      └─ document.addEventListener('click', function(e) {                  │
+│         ├─ const btn = e.target.closest(...);                             │
+│         ├─ if (btn) { ... }                                               │
+│         └─ });                                                             │
+│                                                                             │
+│      }  ← ERRO AQUI! (Linha 7033)                                         │
+│      });                                                                    │
+│                                                                             │
+│  Balanceamento:                                                             │
+│  ───────────────────────────────────────────────────────────────────────  │
+│      ( 342   vs  342 )  ✓ OK                                              │
+│      { 111   vs  112 }  ✗ ERRO: 1 BRACE EXTRA                            │
+│      [ 93    vs  93 ]   ✓ OK                                              │
+│                                                                             │
+│  Solucao:                                                                   │
+│  ───────────────────────────────────────────────────────────────────────  │
+│  Remover a linha 7033 que contem: } // FIM: if (csModal && csForm)       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ BLOCO 17: Linhas 7792-8154                                           [ERRO 2]│
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Estrutura:                                                                │
+│  ───────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  window.addEventListenerUnico(document, 'DOMContentLoaded', function() {  │
+│  ↓                                                                          │
+│  (function() {                                                             │
+│  ├─ const modalAnalise = document.getElementById('modalAnaliseCritica');  │
+│  ├─ const btnsAnalise = document.querySelectorAll('.btn-analise');        │
+│  │                                                                         │
+│  └─ btnsAnalise.forEach(btn => {                                          │
+│     ├─ btn.addEventListener('click', function() {                         │
+│     │  ├─ const itemId = this.getAttribute('data-item-id');              │
+│     │  │                                                                  │
+│     │  └─ Promise.all([...])                                             │
+│     │     ├─ .then(([orcamentoData, amostrasData]) => { ... })           │
+│     │     └─ .catch(error => { ... });                                   │
+│     └─ });                                                                │
+│  }                                                                         │
+│  ← ERRO: Nao fecha a IIFE!                                               │
+│  ← ERRO: Nao fecha o callback de DOMContentLoaded!                       │
+│                                                                             │
+│  Balanceamento:                                                             │
+│  ───────────────────────────────────────────────────────────────────────  │
+│      ( 218   vs  216 )  ✗ ERRO: 2 PARENTHESES FALTANDO                  │
+│      { 62    vs  60 }   ✗ ERRO: 2 BRACES FALTANDO                       │
+│      [ 20    vs  20 ]   ✓ OK                                              │
+│                                                                             │
+│  Solucao:                                                                   │
+│  ───────────────────────────────────────────────────────────────────────  │
+│  Adicionar APOS a linha 8153:                                             │
+│      })();                          ← Fechar a IIFE                       │
+│      }, 'modalAnaliseCriticaInit');  ← Fechar o callback                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ BLOCO 18: Linhas 8156-9424                                           [ERRO 3]│
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Estrutura:                                                                │
+│  ───────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  (function() {                      ✓ ABRE                                │
+│      ├─ const inputCpfCnpj = ...                                          │
+│      ├─ function aplicarMascaraCpfCnpj(valor) { ... }                    │
+│      ├─ function validarCPF(cpf) { ... }                                 │
+│      ├─ function validarCNPJ(cnpj) { ... }                               │
+│      ├─ async function fetchCNPJ(cnpj) { ... }                           │
+│      │                                                                     │
+│      └─ // ... mais 600 linhas de codigo ...                             │
+│                                                                             │
+│  })();                              ✓ FECHA CORRETAMENTE                 │
+│                                                                             │
+│  console.log('[ELABORAR] Todas as inicializacoes concluidas!');          │
+│  }, 'elaborarPrincipalInit');  ← ERRO AQUI! (Linha 9409)                │
+│                                  Esta linha nao deveria estar aqui!      │
+│                                  Ela pertence ao BLOCO 17!                │
+│                                                                             │
+│  Balanceamento:                                                             │
+│  ───────────────────────────────────────────────────────────────────────  │
+│      ( 683   vs  684 )  ✗ ERRO: 1 PARENTHESIS EXTRA                      │
+│      { 237   vs  238 }  ✗ ERRO: 1 BRACE EXTRA                            │
+│      [ 97    vs  97 ]   ✓ OK                                              │
+│                                                                             │
+│  Solucao:                                                                   │
+│  ───────────────────────────────────────────────────────────────────────  │
+│  Remover a linha 9409: }, 'elaborarPrincipalInit');                       │
+│  (Nao e necessaria neste bloco - sera adicionada ao BLOCO 17 na corr.)  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+SEQUENCIA DE CORRECAO RECOMENDADA
+═════════════════════════════════════════════════════════════════════════════
+
+    PASSO 1                    PASSO 2                    PASSO 3
+    ───────────────────────    ───────────────────────    ───────────────────
+    
+    Bloco 14                   Bloco 17                   Bloco 18
+    Remover linha 7033         Adicionar 2 linhas         Remover linha 9409
+                               apos linha 8153
+    
+    ANTES:                     ANTES:                     ANTES:
+    ─────────────────          ─────────────────          ─────────────────
+    7033: } // FIM             8153: }                    9409: }, 'elab...';
+    7034: <blank>              8154: </script>            9410: <blank>
+    7035: }); // FIM
+                               DEPOIS:                    DEPOIS:
+    DEPOIS:                    ──────────────             ──────────────
+    ─────────────              8153: }                    9409: <blank>
+    7034: }); // FIM           8154: })();                9410: console...
+    7035: <blank>              8155: }, 'id');
+                               8156: </script>
+
+
+RESULTADO FINAL (POS-CORRECAO)
+═════════════════════════════════════════════════════════════════════════════
+
+    Bloco 14:  342 (  vs  342 )  ✓ BALANCEADO
+              105 {  vs  105 }  ✓ BALANCEADO
+               93 [  vs   93 ]  ✓ BALANCEADO
+    
+    Bloco 17:   77 (  vs   77 )  ✓ BALANCEADO
+               25 {  vs   25 }  ✓ BALANCEADO
+               20 [  vs   20 ]  ✓ BALANCEADO
+    
+    Bloco 18:  684 (  vs  684 )  ✓ BALANCEADO
+              238 {  vs  238 }  ✓ BALANCEADO
+               97 [  vs   97 ]  ✓ BALANCEADO
+    
+    ─────────────────────────────────────────
+    TOTAL:   2480 (  vs 2480 )  ✓ OK
+             870 {  vs  870 }  ✓ OK
+             317 [  vs  317 ]  ✓ OK
+
+
+IMPACTO E PRIORIDADE
+═════════════════════════════════════════════════════════════════════════════
+
+    ERRO #1  (Linha 7033)      [ MEDIA ]     - Afeta apenas Contratacoes
+    ERRO #2  (Linhas 7798-8153) [ ALTA ]     - Afeta Analise Critica
+    ERRO #3  (Linha 9409)       [ CRITICA ]   - Quebra tudo depois dela!
+
+    
+RECOMENDACAO:
+─────────────
+Corrigir na ordem: ERRO #3 → ERRO #2 → ERRO #1
+(Do mais critico para o menos critico)
+
+
+═════════════════════════════════════════════════════════════════════════════════
+
+Relatorio Visual Gerado Automaticamente
+Para mais detalhes, consulte: ANALISE_DETALHADA_ERROS_JAVASCRIPT_2025-10-20.md
+
+═════════════════════════════════════════════════════════════════════════════════

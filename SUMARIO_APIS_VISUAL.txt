@@ -1,0 +1,186 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                   MAPA DE INTEGRAÇÕES COM APIs EXTERNAS                                       ║
+║                        Projeto: Cesta de Preços (10/16/2025)                                  ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 1. SERVIÇOS (app/Services/)                                                                    │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────┬────────────────────────────────────────────────────────────────────────────┐
+│ CnpjService      │ Consulta de dados de CNPJ com fallback automático                          │
+│ ├─ ReceitaWS     │ https://www.receitaws.com.br/v1/cnpj/{cnpj} (Primário)                   │
+│ ├─ BrasilAPI     │ https://brasilapi.com.br/api/cnpj/v1/{cnpj} (Secundário)                  │
+│ └─ CNPJ.ROCKS    │ https://publica.cnpj.ws/cnpj/{cnpj} (Terceiro)                            │
+│                  │                                                                             │
+│ Cache: 15 minutos | Retry: 2x | Timeout: 10-15s | Validação: CNPJ                           │
+├──────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ LicitaconService │ Busca em licitações do Tribunal de Contas do RS                           │
+│ ├─ URL Base      │ https://dados.tce.rs.gov.br/dados/licitacon/licitacao/ano/{ano}.csv.zip  │
+│ ├─ Funciona      │ 1) Baixa ZIP / 2) Extrai CSV / 3) Busca local / 4) Enriquece dados       │
+│ └─ Retorna       │ Itens com detalhes de licitação, valores e links                          │
+│                  │                                                                             │
+│ Cache: 24 horas | Busca: Case-insensitive | Timeout: Variável | Dados: Consolidados         │
+└──────────────────┴────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 2. CONTROLADORES (app/Http/Controllers/)                                                       │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────┬──────────────────────────────────────────────────────────────────────┐
+│ CnpjController       │ POST /api/cnpj/consultar                                             │
+│                      │ Rate Limiting: 10/min por IP | Timeout: 10s | Público               │
+├──────────────────────┼──────────────────────────────────────────────────────────────────────┤
+│ PesquisaRapidaCtrl   │ GET /pesquisa/buscar?termo=X (Busca Multi-Fonte)                    │
+│                      │                                                                      │
+│ Fontes (Ordem):      │ 1) Banco Local (contratos_pncp)                                      │
+│  [1] Banco Local     │ 2) API PNCP (/api/search)                                            │
+│  [2] PNCP Search     │ 3) LicitaCon (TCE-RS) via CKAN                                       │
+│  [3] LicitaCon       │ 4) Compras.gov (/modulo-contratos)                                   │
+│  [4] Compras.gov     │ 5) Portal Transparência (DESABILITADO)                               │
+│  [5] Portal CGU      │                                                                      │
+│                      │ Timeout: 10-30s | Público | Resultado: Consolidado                  │
+├──────────────────────┼──────────────────────────────────────────────────────────────────────┤
+│ MapaAtasController   │ GET /mapa-de-atas/buscar (Buscar ARPs)                               │
+│                      │ API: https://pncp.gov.br/api/consulta/v1/atas-registro-precos       │
+│                      │ Filtros: descrição, UASG, CNPJ, UF, município, valor, período       │
+│                      │ Timeout: 30s | Tamanho: até 500 itens                                │
+├──────────────────────┼──────────────────────────────────────────────────────────────────────┤
+│ CatalogoController   │ GET/POST/PUT/DELETE /api/catalogo                                    │
+│                      │ Referências: ARPs + Contratos PNCP + Histórico local                │
+│                      │ Protegido | Busca: Full-text                                         │
+├──────────────────────┼──────────────────────────────────────────────────────────────────────┤
+│ FornecedorController │ GET /fornecedores/consultar-cnpj/{cnpj}                              │
+│                      │ APIs: ReceitaWS, BrasilAPI, PNCP, Compras.gov                        │
+│                      │ Protegido | Importação de planilha                                   │
+└──────────────────────┴──────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 3. COMANDOS DE SINCRONIZAÇÃO (app/Console/Commands/)                                           │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────┬─────────────────────────────────────────────────────────────────────┐
+│ pncp:sincronizar       │ php artisan pncp:sincronizar {--meses=6} {--paginas=50}            │
+│ API: PNCP              │ Sincroniza contratos para banco local (permite busca local)        │
+│ Delay: 100ms           │ Tabela: contratos_pncp (~100K+ registros)                         │
+├────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ cmed:import            │ php artisan cmed:import {arquivo?} {--mes=} {--limpar}             │
+│ Fonte: Excel local     │ Importa medicamentos - Tabela CMED (74 colunas)                    │
+│ Chunks: 1000           │ Tabela: medicamentos_cmed (~40K+ registros)                        │
+├────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ Outros Comandos        │ BaixarCatmat, LicitaconSincronizar,                                │
+│                        │ PopularFornecedoresPNCP, AtualizarFornecedoresContratos             │
+└────────────────────────┴─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 4. APIS EXTERNAS UTILIZADAS                                                                    │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+API PNCP (Portal Nacional de Contratações Públicas)
+├─ https://pncp.gov.br/api/search/                         [Busca textual - RÁPIDA]
+├─ https://pncp.gov.br/api/consulta/v1/contratos          [Listar contratos]
+├─ https://pncp.gov.br/api/consulta/v1/atas-registro-precos [ARPs]
+└─ Timeout: 20-30s | Sem autenticação | Confiabilidade: ALTA
+
+Consulta CNPJ (FALLBACK)
+├─ https://www.receitaws.com.br/v1/cnpj/{cnpj}            [PRIMÁRIO]
+├─ https://brasilapi.com.br/api/cnpj/v1/{cnpj}             [SECUNDÁRIO]
+└─ https://publica.cnpj.ws/cnpj/{cnpj}                     [TERTIB]
+  Timeout: 10-15s | Sem autenticação | Fallback automático
+
+LicitaCon (TCE-RS)
+├─ https://dados.tce.rs.gov.br/api/3/action/package_search [CKAN API]
+├─ https://dados.tce.rs.gov.br/dados/licitacon/licitacao/ano/{ano}.csv.zip
+└─ Timeout: 10s | Sem autenticação | Confiabilidade: MÉDIA
+
+Compras.gov (Portal de Compras Federal)
+├─ https://dadosabertos.compras.gov.br/modulo-contratos/2_consultarContratosItem
+├─ https://dadosabertos.compras.gov.br/modulo-material/4_consultarItemMaterial
+└─ Timeout: 30s | Sem autenticação | Filtro local obrigatório
+
+Portal da Transparência (CGU)
+├─ https://api.portaldatransparencia.gov.br/api-de-dados/contratos
+└─ Auth: Header chave-api-dados | Status: DESABILITADO (em desenvolvimento)
+
+CMED (Medicamentos)
+├─ Fonte: Arquivo Excel local (CMED Outubro 25 - Modificada.xlsx)
+└─ 74 colunas | Preços PF/PMC com ICMS | Dados tributários
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 5. CACHE IMPLEMENTADO                                                                          │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+CnpjService
+├─ Chave: cnpj:{cnpj_limpo}
+├─ TTL: 15 minutos (900 segundos)
+└─ Driver: Redis/File
+
+LicitaconService
+├─ Chave: licitacon_csv_{ano}_{tipo}
+├─ TTL: 24 horas (86400 segundos)
+└─ Tipo: ZIP extraído e cacheado
+
+Database
+├─ Tabela: consultas_pncp_cache
+└─ Propósito: Cache de resultados PNCP
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 6. TRATAMENTO DE ERROS E SEGURANÇA                                                             │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Estratégia:
+├─ Validação de entrada (antes de chamar APIs)
+├─ Retry automático com backoff (2x com delay)
+├─ Fallback para fontes alternativas
+├─ Logging detalhado em storage/logs/laravel.log
+├─ Mensagens claras ao usuário
+└─ Rate Limiting local (CnpjController: 10/min por IP)
+
+Autenticação:
+├─ APIs Públicas: ReceitaWS, BrasilAPI, PNCP, Compras.gov, LicitaCon
+├─ APIs COM Auth: Portal Transparência (API Key no header)
+└─ HTTPS/TLS: Todas as conexões
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 7. PERFORMANCE E VOLUME                                                                        │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Dados Sincronizados:
+├─ Contratos PNCP: ~100.000+ registros (6-12 meses)
+├─ Medicamentos CMED: ~40.000+ registros
+├─ Catmat: ~200.000+ registros
+└─ LicitaCon: Variável (dezenas de mil)
+
+Tempo de Resposta:
+├─ Consulta CNPJ: 2-5 segundos
+├─ Busca Pesquisa Rápida (multi-fonte): 10-30 segundos
+├─ Busca PNCP local: <1 segundo
+└─ Consulta LicitaCon: 3-5 segundos
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 8. ENDPOINTS RESUMIDOS                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+PÚBLICOS (Sem autenticação):
+├─ GET  /health                          Health check
+├─ GET  /pesquisa/buscar?termo=X         Busca multi-fonte
+├─ POST /api/cnpj/consultar              Consulta CNPJ
+├─ GET  /responder-cdf/{token}           Resposta CDF
+└─ POST /api/cdf/responder               Salvar resposta
+
+PROTEGIDOS (Requerem autenticação):
+├─ GET  /pesquisa-rapida                 Página de busca
+├─ POST /pesquisa-rapida/criar-orcamento Criar orçamento
+├─ GET  /mapa-de-atas                    Página de ARPs
+├─ GET  /mapa-de-atas/buscar             API de busca
+├─ GET  /catalogo                        Catálogo
+└─ GET  /fornecedores                    Fornecedores
+
+═════════════════════════════════════════════════════════════════════════════════════════════════
+
+CONCLUSÃO: Sistema de Cesta de Preços com integração ROBUSTA com 7 APIs externas
+   ✓ Cache inteligente       ✓ Retry automático       ✓ Fallback de fontes
+   ✓ Tratamento de erros     ✓ Rate limiting          ✓ Logging detalhado
+   ✓ Validação de entrada    ✓ HTTPS/TLS              ✓ Performance otimizada
+
+═════════════════════════════════════════════════════════════════════════════════════════════════

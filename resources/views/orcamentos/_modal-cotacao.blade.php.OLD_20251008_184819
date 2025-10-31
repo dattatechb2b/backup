@@ -1,0 +1,674 @@
+<!-- Modal: Cotação de Preços -->
+<div class="modal fade" id="modalCotacaoPrecos" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog" style="max-width: 95vw; width: 95vw; margin: 10px auto; max-height: 95vh;">
+        <div class="modal-content" style="height: 95vh; display: flex; flex-direction: column;">
+            <!-- Header -->
+            <div class="modal-header" style="background: #3b82f6; color: white; padding: 12px 20px; flex-shrink: 0;">
+                <h5 class="modal-title" style="font-weight: 700; font-size: 15px; margin: 0;">
+                    <i class="fas fa-search"></i> COTAÇÃO DE PREÇOS
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body" style="overflow-y: auto; padding: 0; flex: 1;">
+                <!-- Descrição do Item -->
+                <div style="background: #e5e7eb; padding: 12px 20px; border-bottom: 1px solid #d1d5db;">
+                    <label style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 4px; display: block;">DESCRIÇÃO DO ITEM A SER COTADO</label>
+                    <div id="cotacao-item-descricao" style="font-size: 13px; font-weight: 600; color: #1f2937;">-</div>
+                </div>
+
+                <!-- ARGUMENTO DE PESQUISA -->
+                <div style="background: #9ca3af; padding: 16px 20px;">
+                    <h6 style="color: white; font-weight: 700; font-size: 12px; margin-bottom: 12px; text-transform: uppercase;">
+                        <i class="fas fa-search"></i> Argumento de Pesquisa
+                    </h6>
+
+                    <!-- Abas -->
+                    <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                        <button class="tab-argumento active" data-tab="palavra-chave" style="flex: 1; padding: 10px 12px; border: none; background: white; border-radius: 3px; font-weight: 600; font-size: 11px; cursor: pointer; color: #1f2937;">
+                            <i class="fas fa-keyboard"></i> LOCALIZAR A DESCRIÇÃO DE ITEM POR PALAVRA-CHAVE
+                        </button>
+                        <button class="tab-argumento" data-tab="catmat" style="flex: 1; padding: 10px 12px; border: none; background: #d1d5db; border-radius: 3px; font-weight: 600; font-size: 11px; cursor: pointer; color: #6b7280;">
+                            <i class="fas fa-barcode"></i> LOCALIZAR PELO CÓDIGO CATMAT/CATSER
+                        </button>
+                    </div>
+
+                    <!-- Conteúdo Aba Palavra-chave -->
+                    <div id="tab-content-palavra-chave" class="tab-content-argumento">
+                        <label style="font-size: 10px; font-weight: 600; color: white; margin-bottom: 6px; display: block; text-transform: uppercase;">
+                            Descrição do Item ou Palavra-chave relacionada à sua busca
+                        </label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                            <input type="text" id="cotacao-palavra-chave" class="form-control form-control-sm" placeholder="Ex: Caneta" style="flex: 1; font-size: 12px;">
+                        </div>
+                        <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                            <label style="display: flex; align-items: center; gap: 6px; color: white; font-size: 11px; cursor: pointer;">
+                                <input type="radio" name="tipo-busca" value="contem" checked style="margin: 0;">
+                                Conteúdo as palavras
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; color: white; font-size: 11px; cursor: pointer;">
+                                <input type="radio" name="tipo-busca" value="exata" style="margin: 0;">
+                                Expressão exata
+                            </label>
+                        </div>
+                        <button id="btn-pesquisar-cotacao" class="btn btn-primary btn-sm" style="min-width: 120px; font-weight: 600; font-size: 11px; padding: 8px 16px;">
+                            <i class="fas fa-search"></i> PESQUISAR
+                        </button>
+                    </div>
+
+                    <!-- Conteúdo Aba CATMAT -->
+                    <div id="tab-content-catmat" class="tab-content-argumento" style="display: none;">
+                        <label style="font-size: 10px; font-weight: 600; color: white; margin-bottom: 6px; display: block; text-transform: uppercase;">
+                            Código CATMAT/CATSER
+                        </label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="cotacao-catmat" class="form-control form-control-sm" placeholder="Digite o código..." style="flex: 1; font-size: 12px;">
+                            <button class="btn btn-primary btn-sm" style="min-width: 120px; font-weight: 600; font-size: 11px;">
+                                <i class="fas fa-search"></i> PESQUISAR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box: Refinar + Resultados -->
+                <div style="display: flex; min-height: 500px;">
+                    <!-- Coluna Esquerda: Refinar -->
+                    <div id="refinar-sidebar" style="flex: 0 0 240px; background: #e5e7eb; padding: 16px; border-right: 1px solid #d1d5db;">
+                        <h6 style="color: #374151; font-weight: 700; font-size: 11px; margin-bottom: 10px; text-transform: uppercase;">
+                            <i class="fas fa-filter"></i> Refinar
+                        </h6>
+
+                        <!-- Texto inicial -->
+                        <div id="refinar-texto-inicial">
+                            <p style="font-size: 11px; color: #6b7280; line-height: 1.4; margin: 0;">
+                                Quando você preencher o campo de busca em <strong>localizar descrição de item</strong>, e depois clicar no botão <strong>pesquisar</strong>, o sistema disponibilizará mais opções de filtros.
+                            </p>
+                        </div>
+
+                        <!-- Filtros (aparecem após pesquisa) -->
+                        <div id="refinar-filtros" style="display: none;">
+                            <!-- Porte da Empresa -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Porte da Empresa</label>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;">
+                                        <input type="radio" name="porte" value="todas" checked> TODAS
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;">
+                                        <input type="radio" name="porte" value="me-epp"> ME/EPP
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Medida de Fornecimento -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Med. de Fornecimento</label>
+                                <div id="filtro-medidas" style="display: flex; flex-direction: column; gap: 4px; max-height: 120px; overflow-y: auto;">
+                                    <!-- Preenchido via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Marca -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Marca</label>
+                                <div id="filtro-marcas" style="display: flex; flex-direction: column; gap: 4px; max-height: 120px; overflow-y: auto;">
+                                    <!-- Preenchido via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Unidade Federativa -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Unidade Federativa</label>
+                                <div id="filtro-ufs" style="display: flex; flex-direction: column; gap: 4px; max-height: 120px; overflow-y: auto;">
+                                    <!-- Preenchido via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Origem das Amostras -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Origem das Amostras</label>
+                                <div id="filtro-origens" style="display: flex; flex-direction: column; gap: 4px;">
+                                    <!-- Preenchido via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Preços dos últimos -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Preços dos últimos</label>
+                                <select id="filtro-periodo" class="form-select form-select-sm" style="font-size: 11px;">
+                                    <option value="12">12 MESES</option>
+                                    <option value="6">6 MESES</option>
+                                    <option value="3">3 MESES</option>
+                                    <option value="24">24 MESES</option>
+                                </select>
+                            </div>
+
+                            <!-- Variação de Preço -->
+                            <div>
+                                <label style="font-size: 10px; font-weight: 700; color: #374151; text-transform: uppercase; margin-bottom: 6px; display: block;">Variação de Preço</label>
+                                <input type="range" id="filtro-variacao" min="0" max="100" value="100" class="form-range" style="width: 100%;">
+                                <div style="display: flex; justify-content: space-between; font-size: 10px; color: #6b7280;">
+                                    <span>R$ <span id="preco-min-slider">0,00</span></span>
+                                    <span>R$ <span id="preco-max-slider">0,00</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna Direita: Resultado da Pesquisa -->
+                    <div style="flex: 1; padding: 16px; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h6 style="color: #374151; font-weight: 700; font-size: 11px; margin: 0; text-transform: uppercase;">
+                                <i class="fas fa-list"></i> Resultado da Pesquisa
+                            </h6>
+                            <select id="ordenar-select" class="form-select form-select-sm" style="width: auto; font-size: 11px;">
+                                <option value="menor-preco">ORDENAR POR: MENOR PREÇO/UNID ▼</option>
+                                <option value="maior-preco">ORDENAR POR: MAIOR PREÇO/UNID ▼</option>
+                                <option value="data-recente">ORDENAR POR: DATA MAIS RECENTE ▼</option>
+                            </select>
+                        </div>
+
+                        <!-- Mensagem Inicial -->
+                        <div id="cotacao-resultado-inicial" class="alert alert-warning" style="background: #fef3c7; border: 1px solid #fbbf24; color: #92400e; font-size: 12px; padding: 12px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Preencha os campos de <strong>localizar descrição de item</strong> e depois clique no botão <strong>pesquisar</strong> para listar amostras de preços.
+                        </div>
+
+                        <!-- Resultados -->
+                        <div id="cotacao-resultados" style="display: none;">
+                            <!-- Estatísticas -->
+                            <div style="background: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
+                                <div style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 10px;">
+                                    <button id="btn-ir-mediana" class="btn btn-sm" style="background: #0891b2; color: white; font-size: 10px; padding: 6px 12px; font-weight: 600;">
+                                        ➜ IR PARA MEDIANA
+                                    </button>
+                                    <button id="btn-selecionar-6" class="btn btn-sm" style="background: #6b7280; color: white; font-size: 10px; padding: 6px 12px; font-weight: 600;">
+                                        ☑ SELECIONAR 6 ITENS A PARTIR DA MEDIANA
+                                    </button>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; font-size: 11px;">
+                                    <div>
+                                        <span style="color: #6b7280; font-size: 10px;">QUANTIDADE DE AMOSTRAS:</span><br>
+                                        <strong id="stats-qtd-amostras" style="font-size: 16px; color: #0891b2;">0</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280; font-size: 10px;">PREÇO MÍNIMO:</span><br>
+                                        <strong id="stats-preco-min" style="font-size: 14px; color: #10b981;">R$ 0,00</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280; font-size: 10px;">PREÇO MÁXIMO:</span><br>
+                                        <strong id="stats-preco-max" style="font-size: 14px; color: #ef4444;">R$ 0,00</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280; font-size: 10px;">MÉDIA DE PREÇOS:</span><br>
+                                        <strong id="stats-media" style="font-size: 14px; color: #3b82f6;">R$ 0,00</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280; font-size: 10px;">MEDIANA:</span><br>
+                                        <strong id="stats-mediana" style="font-size: 14px; color: #0891b2;">R$ 0,00</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tabela -->
+                            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb;">
+                                <table class="table table-sm table-hover" style="font-size: 10px; margin: 0;">
+                                    <thead style="background: #f3f4f6; position: sticky; top: 0; z-index: 1;">
+                                        <tr>
+                                            <th style="width: 30px; padding: 6px; text-align: center;">☑</th>
+                                            <th style="min-width: 350px; padding: 6px;">PRODUTO/SERVIÇO</th>
+                                            <th style="min-width: 220px; padding: 6px;">ORG. LICITANTE / FONTE</th>
+                                            <th style="width: 80px; padding: 6px;">UNIDADE DE FORNEC.</th>
+                                            <th style="width: 80px; padding: 6px; text-align: right;">QUANT.</th>
+                                            <th style="width: 100px; padding: 6px; text-align: right;">VALOR UNITÁRIO (R$)</th>
+                                            <th style="width: 80px; padding: 6px; text-align: center;">AÇÕES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cotacao-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANÁLISE CRÍTICA DAS AMOSTRAS -->
+                <div id="analise-critica-section" style="display: none; background: #9ca3af; padding: 16px 20px; border-top: 2px solid #6b7280;">
+                    <h6 style="color: white; font-weight: 700; font-size: 12px; margin-bottom: 16px; text-transform: uppercase;">
+                        <i class="fas fa-chart-bar"></i> Análise Crítica das Amostras
+                    </h6>
+
+                    <div style="background: white; padding: 16px; border-radius: 4px;">
+                        <!-- Juízo Crítico -->
+                        <div style="margin-bottom: 16px;">
+                            <h6 style="font-size: 11px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase;">Juízo Crítico</h6>
+                            <table class="table table-sm table-bordered" style="font-size: 10px; margin: 0;">
+                                <thead style="background: #f3f4f6;">
+                                    <tr>
+                                        <th style="padding: 6px;">Nº DE AMOSTRAS COLETADAS</th>
+                                        <th style="padding: 6px;">MÉDIA</th>
+                                        <th style="padding: 6px;">DESVIO-PADRÃO</th>
+                                        <th style="padding: 6px;">LIMITE INFERIOR</th>
+                                        <th style="padding: 6px;">LIMITE SUPERIOR</th>
+                                        <th style="padding: 6px;">CRÍTICAS</th>
+                                        <th style="padding: 6px;">AMOSTRAS EXPURGADAS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="text-align: center;">
+                                        <td style="padding: 6px;" id="juizo-num-amostras">11</td>
+                                        <td style="padding: 6px;" id="juizo-media">R$ 2.728,20</td>
+                                        <td style="padding: 6px;" id="juizo-desvio">2.702,15</td>
+                                        <td style="padding: 6px;" id="juizo-limite-inf">R$ 26,05<br>(DP - média)</td>
+                                        <td style="padding: 6px;" id="juizo-limite-sup">R$ 5.430,34<br>(DP + média)</td>
+                                        <td style="padding: 6px;"><span class="badge bg-danger" id="juizo-criticas">0</span></td>
+                                        <td style="padding: 6px;"><span class="badge bg-secondary" id="juizo-expurgadas">10</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Método Estatístico -->
+                        <div style="margin-bottom: 16px;">
+                            <h6 style="font-size: 11px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase;">Método Estatístico Aplicado às Amostras Saneadas</h6>
+                            <table class="table table-sm table-bordered" style="font-size: 10px; margin: 0;">
+                                <thead style="background: #f3f4f6;">
+                                    <tr>
+                                        <th style="padding: 6px;">Nº DE AMOSTRAS VÁLIDAS</th>
+                                        <th style="padding: 6px;">DESVIO-PADRÃO</th>
+                                        <th style="padding: 6px;">COEFICIENTE DE VARIAÇÃO</th>
+                                        <th style="padding: 6px;">MENOR PREÇO</th>
+                                        <th style="padding: 6px;">MÉDIA</th>
+                                        <th style="padding: 6px;">MEDIANA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="text-align: center;">
+                                        <td style="padding: 6px;" id="metodo-num-validas">1</td>
+                                        <td style="padding: 6px;" id="metodo-desvio">0,00</td>
+                                        <td style="padding: 6px;" id="metodo-coef-var">0,00%</td>
+                                        <td style="padding: 6px;" id="metodo-menor">R$ 300,00</td>
+                                        <td style="padding: 6px;" id="metodo-media">R$ 300,00</td>
+                                        <td style="padding: 6px;" id="metodo-mediana">R$ 300,00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Série de Preços Coletados -->
+                        <div style="margin-bottom: 16px;">
+                            <h6 style="font-size: 11px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase;">Série de Preços Coletados</h6>
+
+                            <div id="serie-vazia" style="font-size: 11px; color: #6b7280; padding: 12px; background: #f9fafb; border-radius: 4px; display: none;">
+                                VOCÊ NÃO POSSUI AMOSTRAS DE PREÇOS PARA ESTE ITEM
+                            </div>
+
+                            <div id="serie-tabela">
+                                <div style="max-height: 350px; overflow-y: auto; border: 1px solid #e5e7eb;">
+                                    <table class="table table-sm table-bordered" style="font-size: 10px; margin: 0;">
+                                        <thead style="background: #f3f4f6; position: sticky; top: 0;">
+                                            <tr>
+                                                <th style="width: 50px; padding: 6px;">AMOSTRA</th>
+                                                <th style="width: 90px; padding: 6px;">SITUAÇÃO</th>
+                                                <th style="min-width: 300px; padding: 6px;">FONTE</th>
+                                                <th style="width: 80px; padding: 6px;">MARCA</th>
+                                                <th style="width: 80px; padding: 6px;">DATA</th>
+                                                <th style="width: 70px; padding: 6px;">MEDIDA</th>
+                                                <th style="width: 80px; padding: 6px; text-align: right;">QNT ORIGINAL</th>
+                                                <th style="width: 100px; padding: 6px; text-align: right;">VALOR UNITÁRIO</th>
+                                                <th style="width: 70px; padding: 6px; text-align: center;">AÇÕES</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="serie-tbody">
+                                            <!-- Preenchido via JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="text-align: right; margin-top: 10px;">
+                                    <button id="btn-remover-todas-amostras" class="btn btn-sm" style="background: #dc2626; color: white; font-size: 10px;">
+                                        <i class="fas fa-times"></i> REMOVER TODAS AS AMOSTRAS
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Método Estatístico Final (Resumo) -->
+                        <div style="margin-bottom: 16px;">
+                            <h6 style="font-size: 11px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase;">Método Estatístico Aplicado às Amostras Saneadas</h6>
+                            <div style="background: white; padding: 12px; text-align: right;">
+                                <div style="margin-bottom: 4px;">
+                                    <span style="font-size: 11px; color: #6b7280;">MEDIANA</span>
+                                    <span style="font-size: 13px; margin-left: 20px;" id="final-mediana">R$ 0,05</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <span style="font-size: 11px; color: #6b7280;">MEDIDA DE TENDÊNCIA CENTRAL</span>
+                                    <span style="font-size: 13px; margin-left: 20px;" id="final-tendencia-central">-</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <span style="font-size: 13px; font-weight: 700; color: #3b82f6;">MÉDIA</span>
+                                    <span style="font-size: 16px; font-weight: 700; color: #3b82f6; margin-left: 20px;" id="final-media">R$ 0,05</span>
+                                </div>
+                                <div>
+                                    <span style="font-size: 11px; color: #6b7280;">MENOR PREÇO</span>
+                                    <span style="font-size: 13px; margin-left: 20px;" id="final-menor">R$ 0,04</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Crítica dos Dados -->
+                        <div>
+                            <h6 style="font-size: 11px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase;">Crítica dos Dados</h6>
+                            <button class="btn btn-outline-secondary btn-sm" style="font-size: 10px; margin-bottom: 10px; padding: 4px 10px;">
+                                <i class="fas fa-pencil-alt"></i> ADICIONAR JUSTIFICATIVA OU OBSERVAÇÃO
+                            </button>
+                            <div style="margin-top: 10px;">
+                                <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="critica-medidas-desiguais" style="width: 14px; height: 14px;">
+                                    <label for="critica-medidas-desiguais" style="font-size: 11px; margin: 0; flex: 1;">
+                                        1. Existem amostras com medidas de fornecimentos desiguais.
+                                    </label>
+                                    <button class="btn btn-sm" style="padding: 2px 8px; background: #6b7280; color: white; font-size: 10px; line-height: 1;">+</button>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="critica-valores-discrepantes" style="width: 14px; height: 14px;">
+                                    <label for="critica-valores-discrepantes" style="font-size: 11px; margin: 0; flex: 1;">
+                                        2. Existem amostras com valores muito discrepantes.
+                                    </label>
+                                    <button class="btn btn-sm" style="padding: 2px 8px; background: #6b7280; color: white; font-size: 10px; line-height: 1;">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer" style="padding: 12px 20px; background: #f3f4f6; border-top: 1px solid #d1d5db; flex-shrink: 0;">
+                <div style="display: flex; justify-content: space-between; width: 100%; gap: 10px;">
+                    <button id="btn-concluir-cotacao" class="btn" style="background: #0891b2; color: white; font-weight: 600; font-size: 12px; padding: 8px 16px;">
+                        <i class="fas fa-check"></i> CONCLUIR COTAÇÃO E FECHAR JANELA
+                    </button>
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #9ca3af; color: white; font-weight: 600; font-size: 12px; padding: 8px 16px;">
+                        <i class="fas fa-times"></i> FECHAR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Ajuste de Embalagem -->
+<div class="modal fade" id="modalAjusteEmbalagem" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #3b82f6; color: white; padding: 12px 20px;">
+                <h5 class="modal-title" style="font-weight: 700; font-size: 14px; margin: 0;">
+                    AJUSTE DE EMBALAGEM
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; display: block;">Descrição da Amostra:</label>
+                    <div id="ajuste-descricao" style="font-size: 12px; color: #1f2937; line-height: 1.5;">-</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Coluna Esquerda: Medida Original -->
+                    <div style="background: #9ca3af; padding: 16px; border-radius: 4px;">
+                        <h6 style="color: white; font-weight: 700; font-size: 12px; margin-bottom: 12px; text-transform: uppercase;">Medida de Fornecimento Original</h6>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: white; margin-bottom: 4px; display: block;">MED. DE FORNECIMENTO:</label>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span id="ajuste-medida-original" style="color: white; font-size: 13px; font-weight: 600;">-</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: white; margin-bottom: 4px; display: block;">A EMBALAGEM É:</label>
+                            <select id="ajuste-tipo-embalagem-original" class="form-select form-select-sm" disabled style="font-size: 12px; background: white;">
+                                <option value="primaria">PRIMÁRIA</option>
+                                <option value="secundaria">SECUNDÁRIA</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 10px; font-weight: 600; color: white; margin-bottom: 4px; display: block;">PREÇO UNITÁRIO ORIGINAL:</label>
+                            <div style="background: white; padding: 8px 12px; border-radius: 3px; font-size: 14px; font-weight: 600; color: #1f2937;">
+                                <span id="ajuste-preco-original">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna Direita: Medida Desejada -->
+                    <div style="background: #d1d5db; padding: 16px; border-radius: 4px;">
+                        <h6 style="color: #374151; font-weight: 700; font-size: 12px; margin-bottom: 12px; text-transform: uppercase;">Medida de Fornecimento Desejada</h6>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block;">MEDIDA DESEJADA:</label>
+                            <select id="ajuste-medida-desejada" class="form-select form-select-sm" style="font-size: 12px;">
+                                <option value="">UNIDADE</option>
+                                <option value="un">UN</option>
+                                <option value="kg">KG</option>
+                                <option value="l">L</option>
+                                <option value="m">M</option>
+                                <option value="cx">CX</option>
+                                <option value="pct">PCT</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block;">ESSA EMBALAGEM É:</label>
+                            <select id="ajuste-tipo-embalagem-desejada" class="form-select form-select-sm" style="font-size: 12px;">
+                                <option value="secundaria">SECUNDÁRIA</option>
+                                <option value="primaria">PRIMÁRIA</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block;">FATOR DE MULTIPLICAÇÃO:</label>
+                            <input type="number" id="ajuste-fator-multiplicacao" class="form-control form-control-sm" step="0.01" min="0" value="0.00" style="font-size: 12px;">
+                        </div>
+
+                        <div>
+                            <label style="font-size: 10px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block;">PREÇO UNITÁRIO AJUSTADO:</label>
+                            <div style="background: white; padding: 8px 12px; border-radius: 3px; font-size: 14px; font-weight: 600; color: #0891b2; border: 2px solid #0891b2;">
+                                <span id="ajuste-preco-ajustado">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 12px 20px; background: #f3f4f6;">
+                <button type="button" id="btn-concluir-ajuste" class="btn" style="background: #3b82f6; color: white; font-weight: 600; font-size: 12px;">
+                    <i class="fas fa-check"></i> CONCLUIR
+                </button>
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: #9ca3af; color: white; font-weight: 600; font-size: 12px;">
+                    <i class="fas fa-times"></i> FECHAR
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Detalhes da Fonte Consultada -->
+<div class="modal fade" id="modalDetalhesFonte" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #3b82f6; color: white; padding: 12px 20px;">
+                <h5 class="modal-title" style="font-weight: 700; font-size: 14px; margin: 0;">
+                    DETALHES DA FONTE CONSULTADA
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <table class="table table-sm" style="font-size: 12px;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 200px; font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">FONTE:</td>
+                            <td id="detalhes-fonte" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">IDENTIFICAÇÃO:</td>
+                            <td id="detalhes-identificacao" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">Nº DO PREGÃO:</td>
+                            <td id="detalhes-num-pregao" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">Nº DA ATA:</td>
+                            <td id="detalhes-num-ata" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">DATA/HOMOLOGAÇÃO:</td>
+                            <td id="detalhes-data-homologacao" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">ÓRGÃO:</td>
+                            <td id="detalhes-orgao" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">OBJETO:</td>
+                            <td id="detalhes-objeto" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">LOTE/ITEM/SUBITEM:</td>
+                            <td id="detalhes-lote-item" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">VENCEDOR:</td>
+                            <td id="detalhes-vencedor" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">DESCRIÇÃO:</td>
+                            <td id="detalhes-descricao" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">MARCA:</td>
+                            <td id="detalhes-marca" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">UNIDADE:</td>
+                            <td id="detalhes-unidade" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">QUANTIDADE:</td>
+                            <td id="detalhes-quantidade" style="padding: 8px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #374151; padding: 8px; background: #f3f4f6;">VALOR UNITÁRIO</td>
+                            <td id="detalhes-valor-unitario" style="padding: 8px; font-weight: 700; color: #0891b2; font-size: 14px;">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="padding: 12px 20px; background: #f3f4f6;">
+                <button type="button" id="btn-download-arp" class="btn" style="background: #3b82f6; color: white; font-weight: 600; font-size: 12px;">
+                    <i class="fas fa-download"></i> DOWNLOAD DA ARP
+                </button>
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: #9ca3af; color: white; font-weight: 600; font-size: 12px;">
+                    <i class="fas fa-times"></i> FECHAR
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para o modal de cotação */
+#modalCotacaoPrecos .tab-argumento.active {
+    background: white !important;
+    color: #1f2937 !important;
+}
+
+#modalCotacaoPrecos .tab-argumento:not(.active) {
+    background: #d1d5db !important;
+    color: #6b7280 !important;
+}
+
+#modalCotacaoPrecos .tab-argumento:hover:not(.active) {
+    background: #c7cacf !important;
+}
+
+/* Highlight amarelo para resultados */
+.highlight-termo {
+    background-color: #fef08a;
+    font-weight: 600;
+    padding: 1px 2px;
+}
+
+/* Badge para tags de fonte */
+.badge-fonte {
+    font-size: 9px;
+    padding: 3px 6px;
+    font-weight: 600;
+    border-radius: 2px;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+.badge-licitacon {
+    background: #dc2626;
+    color: white;
+}
+
+.badge-pncp {
+    background: #0891b2;
+    color: white;
+}
+
+.badge-nota-fiscal {
+    background: #dc2626;
+    color: white;
+}
+
+/* Status das amostras */
+.badge-expurgado {
+    background: #dc2626;
+    color: white;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 3px;
+}
+
+/* Botões de ação */
+.btn-acao-amostra {
+    padding: 4px 8px;
+    font-size: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 0 2px;
+}
+
+.btn-remover-amostra {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-detalhes-amostra {
+    background: #9ca3af;
+    color: white;
+}
+
+/* Ajustes de scrollbar */
+#modalCotacaoPrecos ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+#modalCotacaoPrecos ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#modalCotacaoPrecos ::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 4px;
+}
+
+#modalCotacaoPrecos ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+</style>

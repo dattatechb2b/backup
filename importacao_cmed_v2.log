@@ -1,0 +1,14 @@
+✅ Conectado ao banco!
+
+📊 Registros atuais: 0
+
+╔════════════════════════════════════════════════════════════╗
+║  IMPORTAÇÃO - Junho a Outubro 2025                         ║
+╚════════════════════════════════════════════════════════════╝
+
+[Junho 2025] 📂 Tabela CMED Junho 25 - SimTax.xlsx
+   📊 Linhas: 25959 | Colunas: BW
+   ⚠️  Cabeçalho não encontrado!
+
+[Julho 2025] 📂 Tabela CMED Julho 25 - SimTax.xlsx
+PHP Fatal error:  Allowed memory size of 1073741824 bytes exhausted (tried to allocate 67108864 bytes) in /home/dattapro/modulos/cestadeprecos/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Cell/Cell.php on line 211

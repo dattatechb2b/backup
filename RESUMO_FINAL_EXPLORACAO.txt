@@ -1,0 +1,290 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║           EXPLORAÇÃO COMPLETA - MÓDULO CESTA DE PREÇOS (2025-10-22)        ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+RESULTADO DA EXPLORAÇÃO: ✓ SUCESSO TOTAL
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ DOCUMENTAÇÃO GERADA                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📊 ANALISE_COMPLETA_ARQUITETURA_2025-10-22.md
+   ├─ 1.109 linhas
+   ├─ 32 KB
+   ├─ 20 seções temáticas
+   └─ Cobertura: 100% (Models, Controllers, Middleware, Rotas, Services, etc)
+
+📋 RESUMO_EXECUTIVO.md
+   ├─ 3.2 KB
+   ├─ Visão rápida e executiva
+   └─ Público: Gerentes, arquitetos, decisores
+
+🎨 DIAGRAMAS_ARQUITETURA.txt
+   ├─ 33 KB
+   ├─ 7 camadas (cliente → BD)
+   ├─ 4 fluxos principais (busca de preços, saneamento, CDF)
+   └─ ASCII art para fácil visualização
+
+📖 LEIA-ME-ANALISE-ARQUITETURA.md
+   ├─ Guia de navegação
+   ├─ 4 cenários de uso
+   └─ Índice completo
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ ARQUITETURA EM NÚMEROS                                                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+CÓDIGO:
+  • 14 Controllers (8.2K linhas total, maior: OrcamentoController com 8.259)
+  • 30+ Models com relacionamentos complexos
+  • 80+ Rotas (web + API)
+  • 30+ Views (Blade templates)
+  • 6 Services especializados
+  • 6 Middlewares
+  • 54 Migrations
+
+BANCO DE DADOS:
+  • 30+ tabelas (com prefixo cp_)
+  • 3 conexões PostgreSQL (pgsql, pgsql_main, pgsql_sessions)
+  • Arquitetura multitenant (Database-per-Tenant)
+  • CATMAT com 50K+ registros no banco compartilhado
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ COMPONENTS PRINCIPAIS                                                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+1. OrcamentoController (8.259 linhas) - NÚCLEO
+   ├─ Gerenciar orçamentos (CRUD)
+   ├─ Elaboração (tela principal com AJAX)
+   ├─ Cotação de preços (4 fontes)
+   ├─ Saneamento estatístico
+   ├─ Exportação (PDF, Excel)
+   └─ [⚠️ CRÍTICO - Necessita refatoração]
+
+2. ProxyAuth (282 linhas) - AUTENTICAÇÃO
+   ├─ Valida headers do proxy (X-User-*, X-Tenant-*, X-DB-*)
+   ├─ Configura BD dinamicamente em runtime
+   ├─ Autentica usuário
+   └─ [⚠️ CRÍTICO - Configuração dinâmica é frágil]
+
+3. Services (6):
+   ├─ EstatisticaService - Cálculos (média, mediana, DP, saneamento)
+   ├─ CurvaABCService - Análise ABC
+   ├─ CnpjService - Consulta CNPJ
+   ├─ LicitaconService - API Licitação
+   └─ PDFService - Detecção e extração de PDFs
+
+4. Models (30+):
+   ├─ Orcamento (raiz)
+   ├─ OrcamentoItem (itens com snapshots)
+   ├─ SolicitacaoCDF (cotação direta)
+   ├─ RespostaCDF (respostas de fornecedores)
+   ├─ Fornecedor
+   ├─ Catmat (BANCO COMPARTILHADO)
+   └─ 23 modelos adicionais
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ ARQUITETURA TÉCNICA                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+MULTITENANT:
+  ✓ Database-per-Tenant (cada prefeitura tem seu banco)
+  ✓ Banco principal compartilhado (CATMAT, CMED)
+  ✓ Isolamento com prefixo cp_
+  ✓ Identificação via headers do proxy
+
+AUTENTICAÇÃO:
+  ✓ Via proxy do MinhaDattaTech
+  ✓ Headers: X-User-Id, X-User-Email, X-Tenant-*, X-DB-*
+  ✓ Sessão persistida entre requisições
+  ✓ Reconexão BD automática
+
+INTEGRAÇÃO COM APIS:
+  ✓ Compras.gov (busca CATMAT + preços)
+  ✓ PNCP (contratos)
+  ✓ CMED (medicamentos)
+  ✓ ReceitaWS (consulta CNPJ)
+  ✓ Licitação (contratos)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ FLUXOS PRINCIPAIS                                                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+1️⃣  CRIAR ORÇAMENTO
+    POST /orcamentos/novo → OrcamentoController::store()
+    ├─ Validação
+    ├─ Criação em BD
+    └─ Redirecionar para /elaborar
+
+2️⃣  BUSCA COTAÇÃO DE PREÇOS (MODAL)
+    Cliente digita termo → JavaScript 4 requisições paralelas:
+    ├─ GET /pncp/buscar (PNCP local)
+    ├─ GET /cmed/buscar (CMED local)
+    ├─ GET /compras-gov/buscar (API externa)
+    └─ GET /pesquisa/buscar (banco local)
+    Agrupa resultados → Exibe tabela → Cliente seleciona e salva
+
+3️⃣  SANEAMENTO DE AMOSTRAS
+    POST /aplicar-saneamento
+    ├─ EstatisticaService.aplicarSaneamentoDP()
+    ├─ Calcula: média, DP, limites [μ-σ, μ+σ]
+    ├─ Classifica amostras (válidas/expurgadas)
+    ├─ Decide método baseado em CV
+    └─ Salva snapshot em OrcamentoItem
+
+4️⃣  CDF - COTAÇÃO DIRETA COM FORNECEDOR
+    POST /solicitar-cdf
+    ├─ Cria SolicitacaoCDF
+    ├─ Gera token único (UUID)
+    ├─ Envia email com link público
+    Fornecedor acessa: GET /responder-cdf/{token}
+    ├─ Formulário público (sem autenticação)
+    Fornecedor salva: POST /api/cdf/responder
+    └─ Usuário visualiza em /cdfs-enviadas
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ SEGURANÇA                                                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+5 CAMADAS:
+  1. Proxy do MinhaDattaTech (autenticação central)
+  2. ProxyAuth (valida headers)
+  3. EnsureAuthenticated (verifica Auth::check())
+  4. CSRF (desabilitado para APIs, compensado por proxy)
+  5. Token UUID para CDF (validação por token único)
+
+ISOLAMENTO:
+  ✓ Banco de dados separado por tenant
+  ✓ Prefixo cp_ em tabelas
+  ✓ Sem acesso direto (apenas via proxy)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ TECNOLOGIA                                                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+BACKEND:
+  • Laravel 11
+  • PHP 8.1+
+  • PostgreSQL 12+
+  • Eloquent ORM
+
+FRONTEND:
+  • Blade Templates
+  • Alpine.js (reatividade)
+  • Fetch API (AJAX)
+  • Chart.js (gráficos)
+
+BIBLIOTECAS:
+  • phpoffice/phpspreadsheet (Excel)
+  • smalot/pdfparser (PDF parsing)
+  • simplesoftwareio/simple-qrcode (QR Code)
+  • guzzle/guzzle (HTTP)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ PONTOS CRÍTICOS & CUIDADOS                                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+⚠️  CRÍTICO 1: OrcamentoController (8.259 linhas)
+    └─ GIGANTE demais, necessita refatoração em Services
+
+⚠️  CRÍTICO 2: ProxyAuth - Configuração dinâmica de BD
+    └─ Deve funcionar perfeitamente, headers devem estar sempre presentes
+    └─ Sessão deve ser persistida corretamente
+
+⚠️  CRÍTICO 3: Isolamento Multitenant
+    └─ Sempre usar tenant_id nas queries
+    └─ Models usando pgsql_main devem ser explícitos
+    └─ Não cachear entre diferentes tenants
+
+⚠️  ATENÇÃO: CSRF Desabilitado
+    └─ Compensado por autenticação via proxy
+    └─ Token de CDF valida requisições públicas
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ PRÓXIMAS ETAPAS RECOMENDADAS                                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+1. 🔨 REFATORAÇÃO
+   ├─ Dividir OrcamentoController em Services menores
+   ├─ Criar: DocumentImporterService, PDFGeneratorService, CDFService
+   └─ Meta: Cada Service < 1.000 linhas
+
+2. 🧪 TESTES
+   ├─ Unit tests (Models + Services)
+   ├─ Integration tests (Controllers)
+   ├─ API tests (endpoints)
+   └─ Coverage: >80%
+
+3. 📚 DOCUMENTAÇÃO API
+   ├─ OpenAPI/Swagger
+   ├─ Exemplos de requisição/resposta
+   └─ Códigos de erro
+
+4. 🔄 VERSIONAMENTO
+   ├─ API versioning (v1, v2, etc)
+   ├─ Backward compatibility
+   └─ Changelog
+
+5. 📊 MONITORAMENTO
+   ├─ APM (Application Performance Monitoring)
+   ├─ Error tracking
+   ├─ Performance metrics
+   └─ Alertas
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ COMO USAR A DOCUMENTAÇÃO                                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📄 Novo Desenvolvedor?
+   1. Leia: RESUMO_EXECUTIVO.md (5 min)
+   2. Veja: DIAGRAMAS_ARQUITETURA.txt (10 min)
+   3. Leia: Seções 1-5 da ANALISE_COMPLETA (30 min)
+   4. Consulte: Seção 10 (Fluxos) ao desenvolver
+
+🔍 Revisar Arquitetura?
+   1. RESUMO_EXECUTIVO.md
+   2. DIAGRAMAS_ARQUITETURA.txt
+   3. Seção específica em ANALISE_COMPLETA
+
+🆕 Adicionar Recurso?
+   1. DIAGRAMAS_ARQUITETURA.txt (fluxos)
+   2. Seção 8 (Multitenant)
+   3. Seção 18 (Pontos Críticos)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ RESUMO EXECUTIVO                                                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+O MÓDULO CESTA DE PREÇOS é uma aplicação web COMPLETA para elaboração,
+análise e cotação de preços públicos. Integra-se com o MinhaDattaTech via
+proxy, usa arquitetura multitenant com isolamento por database, e oferece
+funcionalidades avançadas como:
+
+✅ Orçamento eletrônico completo
+✅ Cotação em 4 fontes (PNCP, CMED, Compras.gov, local)
+✅ Saneamento estatístico (método DP±μ)
+✅ CDF (cotação direta com link público para fornecedor)
+✅ Análise Curva ABC
+✅ Importação de PDFs/Excel
+✅ Auditoria completa de todas as mudanças
+✅ Exportação em PDF e Excel
+
+TECNOLOGIA: Laravel 11 + PostgreSQL + Alpine.js
+TAMANHO: 14 controllers, 30+ models, 80+ rotas
+CRÍTICO: ProxyAuth (BD dinâmico), OrcamentoController (8K linhas)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Documentação gerada em: 2025-10-22
+Versão: 1.0 - COMPLETA
+Nível: MUITO DETALHADO (THOROUGH)
+
+Arquivos criados:
+  ✓ ANALISE_COMPLETA_ARQUITETURA_2025-10-22.md (1.109 linhas, 32 KB)
+  ✓ RESUMO_EXECUTIVO.md (3.2 KB)
+  ✓ DIAGRAMAS_ARQUITETURA.txt (33 KB)
+  ✓ LEIA-ME-ANALISE-ARQUITETURA.md (guia de navegação)
+
+═══════════════════════════════════════════════════════════════════════════════

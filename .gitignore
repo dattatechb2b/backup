@@ -1,0 +1,130 @@
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/auth.json
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+.claude/settings.local.json
+
+# ==========================================
+# ARQUIVOS GRANDES E DADOS
+# ==========================================
+
+# Dados CMED (JSONs grandes)
+/CMED_EXTRAIDO/
+/CMED*.xlsx
+/CMED*.xls
+/Tabela*.xlsx
+
+# Dados CATMAT (JSONs grandes)
+/storage/app/private/catmat/*.json
+
+# Backups históricos
+/backups/
+
+# ==========================================
+# ARQUIVOS DE BACKUP
+# ==========================================
+
+# Backups de código
+*.backup
+*.backup-*
+*.old
+*.bak
+*-old.*
+*.orig
+
+# ==========================================
+# LOGS E TEMPORÁRIOS
+# ==========================================
+
+# Logs do Laravel
+/storage/logs/*.log
+
+# Arquivos temporários do sistema
+/storage/app/temp/*
+!/storage/app/temp/.gitkeep
+/storage/app/mpdf_temp/*
+!/storage/app/mpdf_temp/.gitkeep
+
+# Cache do Laravel
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+
+# ==========================================
+# ARQUIVOS DE TESTE E TEMPORÁRIOS
+# ==========================================
+
+# Planilhas de teste
+*.xlsx
+*.xls
+*.csv
+
+# PDFs gerados
+*.pdf
+
+# Imagens de teste
+*.PNG
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+# Exceções (arquivos necessários)
+!public/favicon.ico
+!Arquivos_Claude/**/*.png
+!Arquivos_Claude/**/*.jpg
+!docs/**/*.png
+!docs/**/*.jpg
+
+# ==========================================
+# LOGS DE SISTEMA
+# ==========================================
+
+# Logs de sincronização
+/storage/logs/sincronizacao.log
+/storage/logs/importacao_catmat.log
+/storage/logs/caddy-access.log
+/storage/logs/sistema_detalhado/
+
+# ==========================================
+# ESPECÍFICOS DO PROJETO
+# ==========================================
+
+# Arquivos de teste com nomes específicos
+/TESTE_*.xlsx
+/teste_*.xlsx
+/Tabela*.xlsx
+
+# Scripts de teste temporários
+/test_*.php
+/debug_*.php
+
+# ==========================================
+# NOTA IMPORTANTE
+# ==========================================
+# Este .gitignore foi atualizado em 31/10/2025
+# para prevenir commit de arquivos grandes e temporários.
+# Ver: Arquivos_Claude/LIMPEZA_GITHUB_31-10-2025.md

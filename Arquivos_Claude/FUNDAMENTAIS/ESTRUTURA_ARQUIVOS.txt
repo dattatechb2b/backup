@@ -1,0 +1,101 @@
+📁 Arquivos_Claude/
+│
+├── 🚨 PRIORIDADE MÁXIMA
+│   ├── ⚠️_INSTRUCOES_PRIORITARIAS.md
+│   ├── README.md
+│   └── REGRAS_FUNDAMENTAIS.md
+│
+├── 📖 CONTEXTO E STATUS
+│   ├── CONTEXTO_PROJETO.md
+│   ├── STATUS_GERAL_PROJETO.md ⭐
+│   ├── CHECKLIST_GERAL.md
+│   └── GAPS_INTEGRACAO.md
+│
+├── 🆕 IMPLEMENTAÇÕES 07/10/2025
+│   ├── IMPLEMENTACOES_07-10-2025.md ⭐
+│   └── ATUALIZACOES_07-10-2025_PARTE2.md ⭐
+│
+├── 🔧 CORREÇÕES E FIXES
+│   ├── FIX_419_CSRF_ERROR.md
+│   ├── CORRECAO_TIMEOUT_503.md
+│   ├── CORRECAO_BUSCA_PNCP.md
+│   ├── CORRECAO_MODAL_CONTRATACOES_SIMILARES.md
+│   └── CORRECAO_MODAL_CONTRATACOES_SIMILARES_06-10-2025.md
+│
+├── 🚀 IMPLEMENTAÇÕES PRINCIPAIS
+│   ├── IMPLEMENTACAO_SISTEMA_CDF.md
+│   ├── IMPORTACAO_AUTOMATICA_DOCUMENTO.md
+│   ├── IMPLEMENTACAO_IMPORTACAO_PLANILHA.md
+│   ├── PROCESSAMENTO_PDF_INTELIGENTE.md
+│   └── IMPLEMENTACAO_ORIENTACOES_TECNICAS.md
+│
+├── 🔍 OTIMIZAÇÕES
+│   ├── OTIMIZACAO_BUSCA_100_PERCENT.md
+│   ├── SOLUCAO_DEFINITIVA_BUSCA_QUALQUER_PALAVRA.md
+│   ├── INTEGRACAO_PNCP_PESQUISA_RAPIDA.md
+│   ├── ESTATISTICAS_PESQUISA_RAPIDA.md
+│   └── FILTROS_AVANCADOS_PESQUISA_RAPIDA.md
+│
+├── 📊 ANÁLISES
+│   ├── ANALISE_APIS_MULTI_FONTE.md
+│   ├── APIS_IMPLEMENTADAS.md
+│   ├── ESTUDO_SOLICITAR_CDF_ORCAMENTO.md
+│   └── LEVANTAMENTO_FUNCIONALIDADES_EM_DESENVOLVIMENTO.md
+│
+├── 📝 RESUMOS DE SESSÕES
+│   ├── RESUMO_SESSAO_2025-10-01.md
+│   ├── RESUMO_SESSAO_01-10-2025_TARDE.md
+│   ├── RESUMO_SESSAO_02-10-2025.md
+│   ├── RESUMO_SESSAO_02-10-2025_NOITE.md
+│   └── RESUMO_SESSAO_03-10-2025_GAPS.md
+│
+├── 📈 STATUS E MONITORAMENTO
+│   └── STATUS_SISTEMA_PNCP_02-10-2025.md
+│
+├── 💡 REFERÊNCIAS
+│   ├── CAPACIDADES_CLAUDE.md
+│   └── CODIGO_CRITICO_NAO_MEXER.md ⚠️
+│
+└── 📑 ÍNDICES
+    ├── INDEX.md ⭐ NOVO
+    └── ESTRUTURA_ARQUIVOS.txt (este arquivo)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ESTATÍSTICAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total de documentos: 37 arquivos
+Tamanho total: ~550 KB
+Linhas documentadas: ~16.000+
+Funcionalidades: 55+
+Última atualização: 07/10/2025 18:45 BRT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔥 DOCUMENTOS MAIS IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. STATUS_GERAL_PROJETO.md     - Estado atual completo
+2. CODIGO_CRITICO_NAO_MEXER.md - Evitar regressões
+3. REGRAS_FUNDAMENTAIS.md      - Regras invioláveis
+4. IMPLEMENTACOES_07-10-2025.md - Últimas implementações
+5. ATUALIZACOES_07-10-2025_PARTE2.md - Últimas correções
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 PROTOCOLO DE LEITURA PÓS-COMPACTAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ⚠️_INSTRUCOES_PRIORITARIAS.md (obrigatório)
+2. README.md (visão geral)
+3. REGRAS_FUNDAMENTAIS.md (não quebrar)
+4. CONTEXTO_PROJETO.md (arquitetura)
+5. STATUS_GERAL_PROJETO.md (estado atual)
+6. CHECKLIST_GERAL.md (o que falta)
+7. CODIGO_CRITICO_NAO_MEXER.md (não tocar)
+8. IMPLEMENTACOES_07-10-2025.md (hoje manhã)
+9. ATUALIZACOES_07-10-2025_PARTE2.md (hoje tarde)
+10. Demais conforme necessidade
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gerado em: 07/10/2025 16:45 BRT
+Sistema: Cesta de Preços v1.0

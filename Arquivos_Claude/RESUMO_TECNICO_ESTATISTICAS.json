@@ -1,0 +1,436 @@
+{
+  "modulo": "Cesta de Preços",
+  "data_analise": "2025-10-30",
+  "versao": "1.0",
+  "status": "Ativo em Desenvolvimento",
+  
+  "objetivo": "Plataforma para elaboração de orçamentos públicos com referências de preços reais de múltiplas fontes",
+  
+  "localizacao": "/home/dattapro/modulos/cestadeprecos",
+  
+  "estatisticas_codigo": {
+    "controllers": {
+      "total_linhas": 17429,
+      "total_arquivos": 8,
+      "maior_controller": {
+        "nome": "OrcamentoController",
+        "linhas": 8133,
+        "descricao": "Controla todo o fluxo de orçamentos (7 etapas)"
+      },
+      "controllers": [
+        {
+          "nome": "OrcamentoController",
+          "linhas": 8133,
+          "responsabilidade": "CRUD orçamentos, 7 etapas, PDF"
+        },
+        {
+          "nome": "FornecedorController",
+          "linhas": 2483,
+          "responsabilidade": "Gerenciamento de fornecedores"
+        },
+        {
+          "nome": "PesquisaRapidaController",
+          "linhas": 1518,
+          "responsabilidade": "Busca multi-fonte (7 APIs)"
+        },
+        {
+          "nome": "MapaAtasController",
+          "linhas": 1020,
+          "responsabilidade": "Busca avançada em Atas de Registro de Preço"
+        },
+        {
+          "nome": "CatalogoController",
+          "linhas": 887,
+          "responsabilidade": "Catálogo de produtos, histórico"
+        },
+        {
+          "nome": "NotificacaoController",
+          "linhas": 168,
+          "responsabilidade": "Sistema de notificações com polling"
+        },
+        {
+          "nome": "CdfRespostaController",
+          "linhas": 588,
+          "responsabilidade": "Respostas de Cotação de Fornecedor"
+        },
+        {
+          "nome": "CotacaoExternaController",
+          "linhas": 1297,
+          "responsabilidade": "Cotações não-PNCP"
+        }
+      ]
+    },
+    "models": {
+      "total_linhas": 3434,
+      "total_models": 34,
+      "maiores_models": [
+        {
+          "nome": "Orcamento",
+          "linhas": 265,
+          "descricao": "Model central com 7 relacionamentos"
+        },
+        {
+          "nome": "PrecoComprasGov",
+          "linhas": 267,
+          "descricao": "Preços praticados em compras.gov"
+        },
+        {
+          "nome": "MedicamentoCmed",
+          "linhas": 180,
+          "descricao": "26.046 medicamentos ANVISA"
+        },
+        {
+          "nome": "AuditLogItem",
+          "linhas": 158,
+          "descricao": "Auditoria de alterações"
+        }
+      ]
+    },
+    "views": {
+      "total_blade_templates": 13,
+      "diretorio": "resources/views/orcamentos/",
+      "principais": [
+        "create.blade.php",
+        "elaborar.blade.php",
+        "show.blade.php",
+        "_modal-cotacao.blade.php",
+        "pdf.blade.php",
+        "preview.blade.php"
+      ]
+    },
+    "javascript": {
+      "total_kb": 140,
+      "arquivos": [
+        {
+          "nome": "modal-cotacao.js",
+          "tamanho_kb": 117,
+          "descricao": "Busca multi-fonte, renderização, filtros"
+        },
+        {
+          "nome": "sistema-logs.js",
+          "tamanho_kb": 7.7,
+          "descricao": "Sistema de logs client-side"
+        },
+        {
+          "nome": "performance-utils.js",
+          "tamanho_kb": 7.0,
+          "descricao": "Utilitários de performance"
+        },
+        {
+          "nome": "modal-cotacao-performance-patch.js",
+          "tamanho_kb": 8.6,
+          "descricao": "Otimizações e patches"
+        }
+      ]
+    }
+  },
+  
+  "database": {
+    "prefixo_obrigatorio": "cp_",
+    "total_migrations": 69,
+    "suporte_multitenant": true,
+    "tabelas_principais": [
+      "cp_orcamentos",
+      "cp_itens_orcamento",
+      "cp_fornecedores",
+      "cp_contratos_pncp",
+      "cp_catmat",
+      "cp_precos_comprasgov",
+      "cp_medicamentos_cmed",
+      "cp_arp_cabecalhos",
+      "cp_arp_itens",
+      "cp_orgaos",
+      "cp_solicitacoes_cdf",
+      "cp_notificacoes",
+      "cp_contratacoes_similares"
+    ],
+    "registros_estimados": {
+      "medicamentos_cmed": 26046,
+      "precos_comprasgov": 100000,
+      "contratos_pncp": 1000,
+      "materiais_catmat": 50000
+    }
+  },
+  
+  "apis_integradas": {
+    "ativas_tempo_real": [
+      {
+        "nome": "PNCP",
+        "endpoint": "https://pncp.gov.br/api/search/",
+        "tipos": ["contrato", "edital", "ata_registro_preco"],
+        "cache": "4 horas",
+        "rate_limit": "delay 1-2s entre requisições"
+      },
+      {
+        "nome": "Compras.gov",
+        "endpoints": [
+          "/catalogo/1_consultarCatalogo",
+          "/modulo-pesquisa-preco/1_consultarMaterial"
+        ],
+        "descricao": "Preços reais de contratos federais"
+      },
+      {
+        "nome": "TCE-RS",
+        "servico": "TceRsApiService",
+        "descricao": "Contratos e licitações estaduais"
+      },
+      {
+        "nome": "Comprasnet",
+        "servico": "ComprasnetApiService",
+        "descricao": "Contratos federais SIASG"
+      },
+      {
+        "nome": "ViaCEP",
+        "descricao": "Busca de endereços por CEP"
+      }
+    ],
+    "importadas_locais": [
+      {
+        "nome": "CMED",
+        "tipo": "Excel importado",
+        "total": 26046,
+        "ultimo_update": "Julho 2025",
+        "comando": "php artisan cmed:import"
+      },
+      {
+        "nome": "CATMAT",
+        "tipo": "Catálogo de materiais",
+        "total": 50000,
+        "comando": "php artisan catmat:import"
+      }
+    ],
+    "desabilitadas": [
+      {
+        "nome": "Portal da Transparência",
+        "motivo": "Exige codigoOrgao obrigatório"
+      }
+    ]
+  },
+  
+  "etapas_orcamento": {
+    "total": 7,
+    "detalhes": [
+      {
+        "numero": 1,
+        "nome": "Identificação Geral",
+        "campos": ["nome", "objeto", "órgão", "referência_externa"]
+      },
+      {
+        "numero": 2,
+        "nome": "Metodologia de Análise",
+        "campos": ["tipo_avaliação", "parâmetros", "prazo_validade"]
+      },
+      {
+        "numero": 3,
+        "nome": "Cadastramento de Itens",
+        "campos": ["descrição", "unidade", "quantidade", "preço_unitário"]
+      },
+      {
+        "numero": 4,
+        "nome": "Pesquisa de Preços",
+        "descricao": "Modal de cotação multi-fonte"
+      },
+      {
+        "numero": 5,
+        "nome": "Contratações Similares",
+        "descricao": "Análise comparativa com histórico"
+      },
+      {
+        "numero": 6,
+        "nome": "Dados do Orcamentista",
+        "campos": ["nome", "CPF/CNPJ", "endereço", "setor"]
+      },
+      {
+        "numero": 7,
+        "nome": "Análise Crítica",
+        "descricao": "Comentários finais e justificativas"
+      }
+    ]
+  },
+  
+  "fontes_busca_rapida": {
+    "total": 7,
+    "ordem_prioridade": [
+      {
+        "posicao": 1,
+        "nome": "CMED",
+        "descricao": "Medicamentos ANVISA"
+      },
+      {
+        "posicao": 2,
+        "nome": "CATMAT+API ComprasGov",
+        "descricao": "Preços reais praticados"
+      },
+      {
+        "posicao": 3,
+        "nome": "Banco Local PNCP",
+        "descricao": "Contratos já sincronizados"
+      },
+      {
+        "posicao": 4,
+        "nome": "API PNCP",
+        "descricao": "Busca em tempo real"
+      },
+      {
+        "posicao": 5,
+        "nome": "TCE-RS",
+        "descricao": "Licitações estaduais"
+      },
+      {
+        "posicao": 6,
+        "nome": "Comprasnet",
+        "descricao": "Contratos federais"
+      },
+      {
+        "posicao": 7,
+        "nome": "Portal Transparência",
+        "descricao": "CGU (desabilitado)"
+      }
+    ]
+  },
+  
+  "commands_artisan": {
+    "total": 19,
+    "categorias": {
+      "importacao": [
+        "cmed:import",
+        "catmat:import",
+        "pncp:sincronizar",
+        "pncp:sincronizar-completo",
+        "comprasgov:baixar-precos",
+        "tcers:import-tabelao",
+        "tcers:import-licitacoes",
+        "orientacoes:import"
+      ],
+      "processamento": [
+        "comprasgov:worker",
+        "comprasgov:scout",
+        "pncp:contratos-publicados"
+      ],
+      "monitoramento": [
+        "comprasgov:monitor",
+        "licitacon:sincronizar",
+        "check-database-setup"
+      ]
+    }
+  },
+  
+  "services_especializados": {
+    "total": 17,
+    "por_categoria": {
+      "api_integracao": [
+        "TceRsApiService",
+        "ComprasnetApiService",
+        "ComprasnetApiNovaService",
+        "CnpjService",
+        "LicitaconService"
+      ],
+      "pdf_processing": [
+        "PDFDetectorManager",
+        "FormatoDetector",
+        "FormatoExtrator",
+        "GenericoDetector",
+        "MapaApuracaoDetector",
+        "TabelaHorizontalDetector"
+      ],
+      "analise_dados": [
+        "EstatisticaService",
+        "CurvaABCService",
+        "DataNormalizationService"
+      ]
+    }
+  },
+  
+  "performance": {
+    "modal_cotacao": {
+      "busca_multipla_paralelo": "3-5 segundos",
+      "cache_resultados": "60 segundos",
+      "debounce_busca": "300ms"
+    },
+    "importacao_precos": {
+      "limite_padrao": "3 GB",
+      "velocidade": "~1000 registros/segundo",
+      "processamento_paralelo": "4 workers"
+    },
+    "busca_banco_local": {
+      "fts_search": "<100ms",
+      "indices": ["catmat_codigo", "preco_unitario", "data_compra"]
+    }
+  },
+  
+  "estrutura_arquivos": {
+    "tamanhos_directorios": {
+      "app": "~500KB",
+      "database": "~200KB",
+      "resources": "~300KB",
+      "public": "~150KB",
+      "routes": "~50KB"
+    },
+    "diretorios_principais": [
+      "app/Http/Controllers/",
+      "app/Models/",
+      "app/Services/",
+      "app/Console/Commands/",
+      "database/migrations/",
+      "resources/views/orcamentos/",
+      "public/js/",
+      "routes/"
+    ]
+  },
+  
+  "desafios_atuais": [
+    {
+      "id": 1,
+      "tipo": "Refatoração",
+      "descricao": "OrcamentoController muito grande (8.133 linhas)",
+      "impacto": "Alto",
+      "solucao": "Separar em Services especializados"
+    },
+    {
+      "id": 2,
+      "tipo": "Performance",
+      "descricao": "Modal de Cotação complexo (117 KB JS)",
+      "impacto": "Médio",
+      "solucao": "Separar em módulos ES6, lazy loading"
+    },
+    {
+      "id": 3,
+      "tipo": "API",
+      "descricao": "PNCP com rate limits implícitos",
+      "impacto": "Médio",
+      "solucao": "Implementar backoff exponencial"
+    },
+    {
+      "id": 4,
+      "tipo": "Dados",
+      "descricao": "Compras.gov apenas últimos 12 meses",
+      "impacto": "Baixo",
+      "solucao": "Arquivar dados históricos"
+    }
+  ],
+  
+  "proximas_melhorias": [
+    "Refatorar OrcamentoController em Services",
+    "Separar JavaScript em módulos ES6",
+    "Implementar WebSocket para busca real-time",
+    "Cache distribuído com Redis",
+    "IA para sugestões automáticas de preços",
+    "Dashboard de análises estatísticas",
+    "Export em múltiplos formatos"
+  ],
+  
+  "usuarios_finais": [
+    {
+      "tipo": "Orcamentista",
+      "descricao": "Elabora orçamentos com referências de preço"
+    },
+    {
+      "tipo": "Analista",
+      "descricao": "Revisa e aprova orçamentos"
+    },
+    {
+      "tipo": "Órgão Público",
+      "descricao": "Usa como referência para contratações"
+    }
+  ]
+}

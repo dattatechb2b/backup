@@ -1,0 +1,2261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento Estimativo - {{ $orcamento->numero }}</title>
+    <style>
+        /* ========================================
+           FASE 4.1: LAYOUT FORMAL PRETO E BRANCO
+           ======================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            color: #000000;
+            background: #FFFFFF;
+            line-height: 1.3;
+        }
+
+        .page {
+            width: 100%;
+            padding: 20px;
+            page-break-after: always;
+        }
+
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        /* Header repetido em todas as páginas */
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+            background: #FFFFFF;
+            position: relative;
+        }
+
+        .header img.brasao-header {
+            max-width: 60px;
+            max-height: 60px;
+            margin-bottom: 5px;
+            object-fit: contain;
+        }
+
+        .header h1 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #000000;
+        }
+
+        .header p {
+            font-size: 9pt;
+            margin: 2px 0;
+            color: #000000;
+        }
+
+        /* Capa */
+        .capa {
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        .capa h1 {
+            font-size: 32pt;
+            font-weight: bold;
+            padding: 30px;
+            border: 3px solid #000000;
+            margin: 50px auto;
+            max-width: 600px;
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        .capa .dados-box {
+            background: #FFFFFF;
+            border: 2px solid #000000;
+            padding: 20px;
+            margin: 30px auto;
+            max-width: 700px;
+            text-align: left;
+        }
+
+        .capa .dados-box h2 {
+            font-size: 14pt;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .capa .dados-box table {
+            width: 100%;
+            font-size: 10pt;
+        }
+
+        .capa .dados-box td {
+            padding: 5px;
+            vertical-align: top;
+            border: none;
+        }
+
+        .capa .dados-box td:first-child {
+            font-weight: bold;
+            width: 200px;
+        }
+
+        /* Seções - FUNDO PRETO, TEXTO BRANCO */
+        .secao {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 8px 12px;
+            margin: 20px 0 15px 0;
+            font-weight: bold;
+            font-size: 11pt;
+            text-transform: uppercase;
+        }
+
+        /* Tabelas - BORDAS PRETAS */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 9pt;
+            border: 1px solid #000000;
+        }
+
+        table th {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 6px;
+            border: 1px solid #000000;
+            text-align: left;
+            font-weight: bold;
+            font-size: 8pt;
+        }
+
+        table td {
+            padding: 5px;
+            border: 1px solid #000000;
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #FFFFFF;
+        }
+
+        /* Badges de situação - SEM COR, APENAS BORDA */
+        .badge-validada {
+            background: #FFFFFF;
+            color: #000000;
+            padding: 3px 8px;
+            border: 1px solid #000000;
+            font-weight: bold;
+            font-size: 8pt;
+            display: inline-block;
+        }
+
+        .badge-expurgada {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 3px 8px;
+            border: 1px solid #000000;
+            font-weight: bold;
+            font-size: 8pt;
+            display: inline-block;
+        }
+
+        /* Box de destaque - APENAS BORDA */
+        .box-destaque {
+            background: #FFFFFF;
+            border: 2px solid #000000;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        /* Rodapé */
+        .rodape {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 8pt;
+            color: #000000;
+            padding: 10px;
+            border-top: 1px solid #000000;
+            background: #FFFFFF;
+        }
+
+        /* Assinatura */
+        .assinatura {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .assinatura-linha {
+            border-top: 2px solid #000000;
+            width: 400px;
+            margin: 0 auto;
+            padding-top: 5px;
+        }
+
+        /* Formatação de valores */
+        .valor {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* Justificativa - FUNDO BRANCO, BORDA ESQUERDA PRETA */
+        .justificativa-box {
+            background: #FFFFFF;
+            border-left: 4px solid #000000;
+            border: 1px solid #000000;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 9pt;
+        }
+
+        /* Quebra de página - REMOVIDA: estava gerando páginas em branco
+        .quebra-pagina {
+            page-break-before: always;
+        }
+        */
+
+        /* Texto em negrito */
+        strong, b {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        /* Parágrafos */
+        p {
+            margin: 3px 0;
+            text-align: justify;
+            color: #000000;
+        }
+
+        /* Listas */
+        ul, ol {
+            margin: 7px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 3px 0;
+        }
+    </style>
+</head>
+<body>
+
+@php
+    // Determinar brasão GLOBAL (priorizar orgão, depois orçamento)
+    $brasaoPath = $orgao->brasao_path ?? $orcamento->brasao_path ?? null;
+    $brasaoAbsoluto = $brasaoPath ? storage_path('app/public/' . $brasaoPath) : null;
+    $temBrasao = $brasaoAbsoluto && file_exists($brasaoAbsoluto);
+
+    // Determinar ORÇAMENTISTA para usar nos headers
+    $orcamentistaGlobal = $orcamento->orcamentista_nome ?? ($orcamento->user ? $orcamento->user->name : null) ?? 'Não informado';
+@endphp
+
+{{-- ========================================
+     PÁGINA 1: CAPA
+     ======================================== --}}
+<div class="page capa">
+
+    @if($brasaoAbsoluto && file_exists($brasaoAbsoluto))
+    <div style="text-align: center; margin-bottom: 15px;">
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 100px; max-height: 100px; object-fit: contain;">
+    </div>
+    @endif
+
+    @if($orgao)
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-size: 16pt; margin: 0;">{{ strtoupper($orgao->nome) }}</h2>
+        @if($orgao->cnpj)
+        <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+        @endif
+        @if($orgao->endereco)
+        <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+        @endif
+        @if($orgao->cidade && $orgao->uf)
+        <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+        @endif
+        @if($orgao->telefone || $orgao->email)
+        <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+            @if($orgao->telefone){{ $orgao->telefone }}@endif
+            @if($orgao->telefone && $orgao->email) | @endif
+            @if($orgao->email){{ $orgao->email }}@endif
+        </p>
+        @endif
+    </div>
+    @endif
+
+    <div style="margin: 30px 0;">
+        <p style="font-size: 11pt;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <h1>ORÇAMENTO ESTIMATIVO</h1>
+
+    <div class="dados-box">
+        <h2>DADOS DO ORÇAMENTO</h2>
+        <table>
+            <tr>
+                <td>OBJETO:</td>
+                <td>{{ $orcamento->objeto }}</td>
+            </tr>
+            <tr>
+                <td>UNID. INTERESSADA:</td>
+                <td>{{ $orcamento->orgao_interessado }}</td>
+            </tr>
+            <tr>
+                <td>REFERÊNCIA EXTERNA:</td>
+                <td>{{ $orcamento->referencia_externa ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>PARAMETRO(S):</td>
+                <td>{{ $orcamento->parametros ?? 'CONTRATAÇÕES SIMILARES FEITAS PELA ADMINISTRAÇÃO PÚBLICA' }}</td>
+            </tr>
+            <tr>
+                <td>CONCLUSÃO:</td>
+                <td>{{ $orcamento->data_conclusao ? \Carbon\Carbon::parse($orcamento->data_conclusao)->format('d/m/Y') : 'N/A' }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+{{-- ========================================
+     PÁGINA 2: DADOS + PREÇOS ESTIMADOS
+     ======================================== --}}
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+        <p style="margin-top: 5px; font-size: 8pt; color: #000;"><strong>Orçamentista:</strong> {{ $orcamentistaGlobal }}</p>
+    </div>
+
+    <div class="secao">1 - DADOS DO ORÇAMENTO</div>
+
+    <table>
+        <tr>
+            <td style="width: 150px; font-weight: bold;">NOME:</td>
+            <td>{{ $orcamento->nome }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">NÚMERO:</td>
+            <td>{{ $orcamento->numero }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">OBJETO:</td>
+            <td>{{ $orcamento->objeto }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">UNID. INTERESSADA:</td>
+            <td>{{ $orcamento->orgao_interessado }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">ORÇAMENTISTA:</td>
+            <td>
+                {{ $orcamento->orcamentista_nome ?? $orcamento->usuario->name ?? 'N/A' }}
+                @if($orcamento->orcamentista_cpf_cnpj)
+                <br><small>CPF/CNPJ: {{ $orcamento->orcamentista_cpf_cnpj }}</small>
+                @endif
+                @if($orcamento->orcamentista_setor)
+                <br><small>Setor: {{ $orcamento->orcamentista_setor }}</small>
+                @endif
+            </td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">REFERÊNCIA EXTERNA:</td>
+            <td>{{ $orcamento->referencia_externa ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">PARAMETRO(S):</td>
+            <td>{{ $orcamento->parametros ?? 'CONTRATAÇÕES SIMILARES FEITAS PELA ADMINISTRAÇÃO PÚBLICA' }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">CONCLUSÃO:</td>
+            <td>{{ $orcamento->data_conclusao ? \Carbon\Carbon::parse($orcamento->data_conclusao)->format('d/m/Y') : 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">CASAS DECIMAIS:</td>
+            <td>{{ $orcamento->casas_decimais === 'quatro' ? 'Quatro (4)' : 'Duas (2)' }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">FONTES UTILIZADAS:</td>
+            <td>
+                @php
+                    $fontes = [];
+                    if($orcamento->usou_similares) $fontes[] = 'Contratações Similares (PNCP)';
+                    if($orcamento->usou_comprasgov) $fontes[] = 'Compras.gov.br';
+                    if($orcamento->usou_cdf) $fontes[] = 'CDF (Cotação Direta)';
+                    if($orcamento->usou_ecommerce) $fontes[] = 'E-commerce';
+                @endphp
+                {{ count($fontes) > 0 ? implode(', ', $fontes) : 'Não especificadas' }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="secao" style="margin-top: 30px;">2 - PREÇOS ESTIMADOS</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 80px;">LOTE/ITEM</th>
+                <th>DESCRIÇÃO</th>
+                <th style="width: 80px;">UND. DE FORNEC.</th>
+                <th style="width: 60px;">QNT</th>
+                <th style="width: 100px; text-align: right;">PREÇO UNIT. (R$)</th>
+                <th style="width: 100px; text-align: right;">PREÇO TOTAL (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $valorGlobal = 0;
+            @endphp
+            @foreach($orcamento->itens as $item)
+            @php
+                $precoTotal = $item->quantidade * $item->preco_unitario;
+                $valorGlobal += $precoTotal;
+                $loteItem = ($item->lote_id ? str_pad($item->lote->numero ?? '00', 2, '0', STR_PAD_LEFT) : '00') . '/' . str_pad($item->numero_item ?? '001', 3, '0', STR_PAD_LEFT);
+            @endphp
+            <tr>
+                <td>{{ $loteItem }}</td>
+                <td>{{ $item->descricao }}</td>
+                <td>{{ $item->medida_fornecimento }}</td>
+                <td style="text-align: right;">{{ number_format($item->quantidade, 2, ',', '.') }}</td>
+                <td class="valor">{{ 'R$ ' . number_format($item->preco_unitario, 2, ',', '.') }}</td>
+                <td class="valor">{{ 'R$ ' . number_format($precoTotal, 2, ',', '.') }}</td>
+            </tr>
+            @endforeach
+            <tr style="font-weight: bold; background: #e0e0e0;">
+                <td colspan="5" style="text-align: right;">VALOR GLOBAL</td>
+                <td class="valor">{{ 'R$ ' . number_format($valorGlobal, 2, ',', '.') }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{{-- ========================================
+     PÁGINAS 3-N: SÉRIE DE PREÇOS COLETADOS (para cada item COM amostras)
+     ======================================== --}}
+@foreach($orcamento->itens as $index => $item)
+@if($item->estatisticas)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">3 - SÉRIE DE PREÇOS COLETADOS</div>
+
+    <div style="background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <table style="border: none;">
+            <tr>
+                <td style="width: 100px; font-weight: bold; border: none;">LOTE/ITEM:</td>
+                <td style="border: none;">{{ ($item->lote_id ? str_pad($item->lote->numero ?? '00', 2, '0', STR_PAD_LEFT) : '00') . '/' . str_pad($item->numero_item ?? '001', 3, '0', STR_PAD_LEFT) }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; border: none;">DESCRIÇÃO DO ITEM:</td>
+                <td style="border: none;">{{ $item->descricao }}</td>
+            </tr>
+        </table>
+    </div>
+
+    @if($item->estatisticas)
+    {{-- JUÍZO CRÍTICO --}}
+    <h3 style="font-size: 10pt; margin: 15px 0 5px 0;">JUÍZO CRÍTICO</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nº DE AMOSTRAS COLETADAS</th>
+                <th>MÉDIA</th>
+                <th>DESVIO-PADRÃO</th>
+                <th>LIMITE INFERIOR</th>
+                <th>LIMITE SUPERIOR</th>
+                <th>AMOSTRAS EXPURGADAS</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="text-align: center;">
+                <td>{{ $item->estatisticas['num_amostras_coletadas'] }}</td>
+                <td>R$ {{ number_format($item->estatisticas['media'], 2, ',', '.') }}</td>
+                <td>{{ number_format($item->estatisticas['desvio_padrao'], 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($item->estatisticas['limite_inferior'], 2, ',', '.') }}<br><small>(DP - MÉDIA)</small></td>
+                <td>R$ {{ number_format($item->estatisticas['limite_superior'], 2, ',', '.') }}<br><small>(DP + MÉDIA)</small></td>
+                <td><strong>{{ count($item->estatisticas['amostras_expurgadas']) }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{-- TABELA RESUMIDA DE AMOSTRAS --}}
+    @if(count($item->amostras_processadas) > 0)
+    <table style="margin-top: 15px; font-size: 8pt;">
+        <thead>
+            <tr>
+                <th style="width: 50px;">AMOSTRA</th>
+                <th>ÓRGÃO / FORNECEDOR</th>
+                <th style="width: 120px;">PREGÃO / ARP</th>
+                <th style="width: 100px;">TIPO DE FONTE</th>
+                <th style="width: 80px;">DATA</th>
+                <th style="width: 80px; text-align: right;">PREÇO</th>
+                <th style="width: 80px;">SITUAÇÃO</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($item->amostras_processadas as $idx => $amostra)
+            @php
+                $numAmostra = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
+                $isExpurgada = in_array($idx, $item->estatisticas['amostras_expurgadas']);
+            @endphp
+            <tr>
+                <td style="text-align: center;">{{ $numAmostra }}</td>
+                <td>{{ $amostra['orgao'] ?? 'N/A' }}</td>
+                <td>{{ ($amostra['numero_pregao'] ?? '') . ' ' . ($amostra['numero_ata'] ?? '') }}</td>
+                <td>{{ $amostra['fonte'] ?? 'N/A' }}</td>
+                <td>{{ $amostra['data_publicacao'] ? \Carbon\Carbon::parse($amostra['data_publicacao'])->format('d/m/Y') : 'N/A' }}</td>
+                <td class="valor">R$ {{ number_format($amostra['valor_unitario'] ?? 0, 4, ',', '.') }}</td>
+                <td style="text-align: center;">
+                    @if($isExpurgada)
+                    <span class="badge-expurgada">EXPURGADA</span>
+                    @else
+                    <span class="badge-validada">VALIDADA</span>
+                    @endif
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
+    {{-- MÉTODO ESTATÍSTICO APLICADO --}}
+    <div style="margin-top: 20px; background: #fef9e7; padding: 10px; border-radius: 5px;">
+        <h4 style="font-size: 9pt; margin-bottom: 8px;">MÉTODO ESTATÍSTICO APLICADO ÀS AMOSTRAS SANEADAS</h4>
+        <p style="font-size: 8pt; margin-bottom: 10px;">
+            Para escolha do método estatístico a ser utilizado para definição do preço de mercado, o usuário seguiu a diretriz do Manual de Orientações sobre Pesquisas de Preços, publicado pelo do Superior Tribunal de Justiça. Nesse caso, se o coeficiente de variação das amostras saneadas for menor ou igual a 25%, se estima o preço de referência a partir da média aritmética (simples); se o coeficiente de variação for maior que 25% (vinte e cinco por cento), se estima com base na mediana das amostras saneadas.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nº DE AMOSTRAS VÁLIDAS</th>
+                    <th>DESVIO-PADRÃO</th>
+                    <th>COEFICIENTE DE VARIAÇÃO</th>
+                    <th>MENOR PREÇO</th>
+                    <th>MÉDIA</th>
+                    <th>MEDIANA</th>
+                    <th>MÉTODO ADOTADO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="text-align: center;">
+                    <td>{{ $item->estatisticas['num_amostras_validas'] }}</td>
+                    <td>{{ number_format($item->estatisticas['desvio_padrao'], 2, ',', '.') }}</td>
+                    <td>{{ number_format($item->estatisticas['coef_variacao'], 2, ',', '.') }}%</td>
+                    <td>R$ {{ number_format($item->estatisticas['menor_preco'], 2, ',', '.') }}</td>
+                    <td>R$ {{ number_format($item->estatisticas['media'], 2, ',', '.') }}</td>
+                    <td>R$ {{ number_format($item->estatisticas['mediana'], 2, ',', '.') }}</td>
+                    <td><strong>{{ $item->estatisticas['metodo'] }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {{-- ========================================
+         AUDITORIA E RASTREABILIDADE DO ITEM
+         Inserido após MÉTODO ESTATÍSTICO
+         ======================================== --}}
+    @php
+        // Buscar snapshot do item (se existir)
+        $snapshot = DB::table('audit_snapshots')
+            ->where('item_id', $item->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        // Buscar últimas 3 ações de auditoria
+        $ultimasAcoes = DB::table('audit_log_itens')
+            ->where('item_id', $item->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        // Contar amostras expurgadas com justificativa
+        $amostrasExpurgadasComJustificativa = collect($item->amostras_processadas)
+            ->filter(function($amostra, $idx) use ($item) {
+                return in_array($idx, $item->estatisticas['amostras_expurgadas'] ?? []);
+            })
+            ->values();
+    @endphp
+
+    <div style="margin-top: 20px; background: #FFFFFF; border: 2px solid #000000; padding: 12px; page-break-inside: avoid;">
+        <h4 style="font-size: 10pt; margin: 0 0 10px 0; font-weight: bold; text-transform: uppercase;">
+            <span style="background: #000000; color: #FFFFFF; padding: 4px 8px; margin-right: 8px;">📋</span>
+            AUDITORIA E RASTREABILIDADE
+        </h4>
+
+        {{-- SNAPSHOT ESTATÍSTICO --}}
+        @if($snapshot)
+        <div style="margin-bottom: 12px;">
+            <p style="font-size: 9pt; margin: 0 0 6px 0; font-weight: bold;">SNAPSHOT ESTATÍSTICO:</p>
+            <table style="font-size: 8pt; border: 1px solid #000000;">
+                <tr>
+                    <td style="width: 120px; font-weight: bold; background: #f5f5f5;">Data/Hora:</td>
+                    <td>{{ \Carbon\Carbon::parse($snapshot->timestamp)->format('d/m/Y H:i:s') }}</td>
+                    <td style="width: 120px; font-weight: bold; background: #f5f5f5;">N Válidas:</td>
+                    <td style="text-align: center;">{{ $snapshot->n_validas ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background: #f5f5f5;">Média:</td>
+                    <td>R$ {{ number_format($snapshot->media ?? 0, 2, ',', '.') }}</td>
+                    <td style="font-weight: bold; background: #f5f5f5;">Mediana:</td>
+                    <td>R$ {{ number_format($snapshot->mediana ?? 0, 2, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background: #f5f5f5;">DP (σ):</td>
+                    <td>{{ number_format($snapshot->desvio_padrao ?? 0, 2, ',', '.') }}</td>
+                    <td style="font-weight: bold; background: #f5f5f5;">CV (%):</td>
+                    <td>{{ number_format($snapshot->coef_variacao ?? 0, 2, ',', '.') }}%</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background: #f5f5f5;">Método:</td>
+                    <td colspan="3"><strong>{{ strtoupper($snapshot->metodo ?? 'N/A') }}</strong></td>
+                </tr>
+            </table>
+        </div>
+        @endif
+
+        {{-- ÚLTIMAS 3 AÇÕES --}}
+        @if($ultimasAcoes && $ultimasAcoes->count() > 0)
+        <div style="margin-bottom: 12px;">
+            <p style="font-size: 9pt; margin: 0 0 6px 0; font-weight: bold;">ÚLTIMAS AÇÕES REGISTRADAS:</p>
+            <table style="font-size: 7pt; border: 1px solid #000000;">
+                <thead>
+                    <tr style="background: #000000; color: #FFFFFF;">
+                        <th style="width: 18%;">DATA/HORA</th>
+                        <th style="width: 22%;">USUÁRIO</th>
+                        <th style="width: 28%;">EVENTO</th>
+                        <th style="width: 32%;">DETALHES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($ultimasAcoes as $acao)
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($acao->created_at)->format('d/m/Y H:i') }}</td>
+                        <td>{{ $acao->usuario_nome ?? 'Sistema' }}</td>
+                        <td>
+                            @php
+                                $eventosMap = [
+                                    'APPLY_SANITIZATION_DP' => 'Saneamento DP±MEAN',
+                                    'APPLY_SANITIZATION_MEDIAN' => 'Saneamento MEDIAN±PERC',
+                                    'PURGE_SAMPLE' => 'Expurgo Manual',
+                                    'REVALIDATE_SAMPLE' => 'Revalidar Amostra',
+                                    'CHANGE_METHODOLOGY' => 'Mudar Metodologia',
+                                    'ADJUST_CONVERSION' => 'Ajustar Conversão',
+                                    'EDIT_SAMPLE' => 'Editar Amostra',
+                                    'ADD_ATTACHMENT' => 'Adicionar Anexo',
+                                    'REMOVE_ATTACHMENT' => 'Remover Anexo',
+                                    'UPDATE_LINK_QR' => 'Atualizar Link/QR',
+                                    'FIX_SNAPSHOT' => 'Fixar Snapshot',
+                                    'GENERATE_PDF' => 'Gerar PDF'
+                                ];
+                            @endphp
+                            {{ $eventosMap[$acao->event_type] ?? $acao->event_type }}
+                        </td>
+                        <td>
+                            @if($acao->sample_number)
+                                <strong>Amostra {{ str_pad($acao->sample_number, 2, '0', STR_PAD_LEFT) }}:</strong>
+                            @endif
+                            @if($acao->before_value && $acao->after_value)
+                                {{ $acao->before_value }} → {{ $acao->after_value }}
+                            @elseif($acao->justification)
+                                {{ Str::limit($acao->justification, 80) }}
+                            @else
+                                Ação executada
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+
+        {{-- AMOSTRAS EXPURGADAS --}}
+        @if($amostrasExpurgadasComJustificativa->count() > 0)
+        <div>
+            <p style="font-size: 9pt; margin: 0 0 6px 0; font-weight: bold;">
+                AMOSTRAS EXPURGADAS:
+                <span style="background: #000000; color: #FFFFFF; padding: 2px 8px; font-size: 9pt;">
+                    {{ $amostrasExpurgadasComJustificativa->count() }}
+                </span>
+            </p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 8pt;">
+                @foreach($amostrasExpurgadasComJustificativa as $idx => $amostra)
+                <li style="margin: 3px 0;">
+                    <strong>Amostra {{ str_pad(array_search($amostra, $item->amostras_processadas) + 1, 2, '0', STR_PAD_LEFT) }}:</strong>
+                    @if(isset($amostra['justificativa_expurgo']))
+                        {{ $amostra['justificativa_expurgo'] }}
+                    @else
+                        Expurgada por estar {{ ($amostra['valor_unitario'] ?? 0) > $item->estatisticas['limite_superior'] ? 'acima' : 'abaixo' }} do limite estatístico
+                    @endif
+                </li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        {{-- Alerta se não houver auditoria --}}
+        @if(!$snapshot && (!$ultimasAcoes || $ultimasAcoes->count() == 0))
+        <p style="font-size: 8pt; margin: 0; color: #666; font-style: italic;">
+            ⚠️ Nenhum registro de auditoria disponível para este item.
+        </p>
+        @endif
+    </div>
+
+    {{-- CRÍTICA DOS DADOS --}}
+    @php
+        $criticasDados = null;
+        if ($item->criticas_dados) {
+            $criticasDados = is_string($item->criticas_dados)
+                ? json_decode($item->criticas_dados, true)
+                : $item->criticas_dados;
+        }
+    @endphp
+
+    @if($criticasDados && (($criticasDados['medidas_desiguais'] ?? false) || ($criticasDados['valores_discrepantes'] ?? false)))
+    <div style="margin-top: 15px; background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; border-radius: 4px; page-break-inside: avoid;">
+        <h4 style="font-size: 9pt; margin-bottom: 8px; color: #856404;">⚠️ CRÍTICA DOS DADOS</h4>
+        <div style="font-size: 8pt; color: #856404;">
+            @if($criticasDados['medidas_desiguais'] ?? false)
+            <p style="margin: 5px 0;">
+                <strong style="font-size: 12pt;">☑</strong> Existem amostras com medidas de fornecimentos desiguais.
+            </p>
+            @endif
+
+            @if($criticasDados['valores_discrepantes'] ?? false)
+            <p style="margin: 5px 0;">
+                <strong style="font-size: 12pt;">☑</strong> Existem amostras com valores muito discrepantes.
+            </p>
+            @endif
+
+            @if(!empty($criticasDados['atualizado_em']))
+            <p style="margin: 10px 0 0 0; font-size: 7pt; color: #666;">
+                Análise registrada em: {{ \Carbon\Carbon::parse($criticasDados['atualizado_em'])->format('d/m/Y H:i') }}
+            </p>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    {{-- DADOS DETALHADOS DE CADA AMOSTRA (01, 02, 03, 04, 05) --}}
+    @foreach($item->amostras_processadas as $idx => $amostra)
+    @php
+        $numAmostra = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
+        $isExpurgada = in_array($idx, $item->estatisticas['amostras_expurgadas']);
+    @endphp
+
+    <div style="margin-top: 15px; page-break-inside: avoid;">
+        <h4 style="font-size: 9pt; background: #e0e0e0; padding: 5px; margin-bottom: 5px;">DADOS DA AMOSTRA {{ $numAmostra }}</h4>
+
+        <table style="font-size: 8pt;">
+            <tr>
+                <td style="width: 150px; font-weight: bold;">SITUAÇÃO:</td>
+                <td colspan="3">
+                    @if($isExpurgada)
+                    <span class="badge-expurgada">EXPURGADA</span>
+                    @if(isset($amostra['justificativa_expurgo']))
+                    <br><small>{{ $amostra['justificativa_expurgo'] }}</small>
+                    @else
+                    <br><small>A amostra está {{ ($amostra['valor_unitario'] ?? 0) > $item->estatisticas['limite_superior'] ? 'acima' : 'abaixo' }} da média + desvio padrão na coleção de amostras, sendo expurgada do orçamento.</small>
+                    @endif
+                    @else
+                    <span class="badge-validada">VALIDADA</span>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">TIPO DE FONTE:</td>
+                <td colspan="3">{{ strtoupper($amostra['fonte'] ?? 'NÃO ESPECIFICADA') }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">ORIGEM:</td>
+                <td colspan="3">{{ strtoupper($amostra['fonte'] ?? 'N/A') }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">ENTIDADE:</td>
+                <td colspan="3">{{ $amostra['orgao'] ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">CÓDIGO DE IDENTIFICAÇÃO:</td>
+                <td colspan="3">{{ $amostra['codigo_identificacao'] ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">PREGÃO/ATA:</td>
+                <td style="width: 35%;">{{ ($amostra['numero_pregao'] ?? '') . ' ' . ($amostra['numero_ata'] ?? '') }}</td>
+                <td style="width: 100px; font-weight: bold;">DATA:</td>
+                <td>{{ $amostra['data_publicacao'] ? \Carbon\Carbon::parse($amostra['data_publicacao'])->format('d/m/Y') : 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">LOTE/ITEM:</td>
+                <td colspan="3">{{ $amostra['lote_item'] ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">DESCRIÇÃO:</td>
+                <td colspan="3">{{ $amostra['descricao'] ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">QUANTIDADE:</td>
+                <td>{{ number_format($amostra['quantidade_original'] ?? 0, 2, ',', '.') }}</td>
+                <td style="font-weight: bold;">VALOR UNITÁRIO:</td>
+                <td>R$ {{ number_format($amostra['valor_unitario'] ?? 0, 2, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">VALOR TOTAL:</td>
+                <td colspan="3">R$ {{ number_format($amostra['valor_total'] ?? 0, 2, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">FORNECEDOR:</td>
+                <td colspan="3">{{ ($amostra['fornecedor_nome'] ?? 'N/A') . ($amostra['fornecedor_cnpj'] ? ' - ' . $amostra['fornecedor_cnpj'] : '') }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">MARCA:</td>
+                <td>{{ $amostra['marca'] ?? 'N/A' }}</td>
+                <td style="font-weight: bold;">UNID. MEDIDA:</td>
+                <td>{{ $amostra['unidade_medida'] ?? $amostra['unid_origem'] ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">UF/MUNICÍPIO:</td>
+                <td colspan="3">{{ $amostra['uf_municipio'] ?? (($amostra['uf'] ?? 'N/A') . '/' . ($amostra['municipio'] ?? 'N/A')) }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; vertical-align: top;">LINK:</td>
+                <td colspan="3">
+                    @php
+                        $linkFonte = $amostra['link_fonte'] ?? $amostra['url'] ?? null;
+                    @endphp
+
+                    @if($linkFonte && $linkFonte !== 'N/A')
+                    <div style="display: table; width: 100%;">
+                        @if(empty($disableQRCodes))
+                        <div style="display: table-cell; vertical-align: top; width: 70px; padding-right: 10px;">
+                            {{-- QR Code gerado via API pública --}}
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data={{ urlencode($linkFonte) }}"
+                                 alt="QR Code"
+                                 style="width: 60px; height: 60px; border: 1px solid #000;">
+                        </div>
+                        @endif
+                        <div style="display: table-cell; vertical-align: top; word-break: break-all; font-size: 7pt; padding-top: 5px;">
+                            {{ $linkFonte }}
+                        </div>
+                    </div>
+                    @else
+                    N/A
+                    @endif
+                </td>
+            </tr>
+            @if(isset($amostra['anexo_ids']) && is_array($amostra['anexo_ids']) && count($amostra['anexo_ids']) > 0)
+            <tr>
+                <td style="font-weight: bold;">ANEXOS:</td>
+                <td colspan="3">
+                    @foreach($amostra['anexo_ids'] as $anexoId)
+                        📎 Anexo #{{ $anexoId }}{{ !$loop->last ? ', ' : '' }}
+                    @endforeach
+                </td>
+            </tr>
+            @endif
+        </table>
+
+        {{-- ========================================
+             RODAPÉ DE AUDITORIA DA AMOSTRA
+             Inserido no final de cada card de amostra (após table)
+             ======================================== --}}
+        @php
+            // Buscar logs de auditoria específicos para esta amostra
+            $logsAmostra = DB::table('audit_log_itens')
+                ->where('item_id', $item->id)
+                ->where('sample_number', $idx + 1)
+                ->orderBy('created_at', 'desc')
+                ->limit(1)
+                ->first();
+        @endphp
+
+        @if($logsAmostra || $isExpurgada)
+        <div style="margin-top: 8px; padding: 8px; background: #f5f5f5; border-top: 2px solid #000000; font-size: 7pt; line-height: 1.4;">
+            <div style="font-weight: bold; margin-bottom: 4px; text-transform: uppercase; color: #000000;">
+                📋 HISTÓRICO DE AUDITORIA
+            </div>
+
+            @if($logsAmostra)
+            <div style="margin-bottom: 3px;">
+                <strong>Última Ação:</strong>
+                @php
+                    $eventosMap = [
+                        'APPLY_SANITIZATION_DP' => 'Saneamento DP±MEAN',
+                        'APPLY_SANITIZATION_MEDIAN' => 'Saneamento MEDIAN±PERC',
+                        'PURGE_SAMPLE' => 'Expurgo Manual',
+                        'REVALIDATE_SAMPLE' => 'Revalidar Amostra',
+                        'CHANGE_METHODOLOGY' => 'Mudar Metodologia',
+                        'ADJUST_CONVERSION' => 'Ajustar Conversão',
+                        'EDIT_SAMPLE' => 'Editar Amostra',
+                    ];
+                @endphp
+                {{ $eventosMap[$logsAmostra->event_type] ?? $logsAmostra->event_type }}
+                ({{ \Carbon\Carbon::parse($logsAmostra->created_at)->format('d/m/Y H:i') }})
+            </div>
+            @endif
+
+            @if($isExpurgada)
+            <div style="margin-bottom: 3px;">
+                <strong>Status:</strong>
+                <span style="background: #000000; color: #FFFFFF; padding: 1px 6px; font-weight: bold;">
+                    VALIDADA → EXPURGADA
+                </span>
+            </div>
+            @endif
+
+            @if($logsAmostra && $logsAmostra->rule_applied)
+            <div style="margin-bottom: 3px;">
+                <strong>Regra Aplicada:</strong> {{ $logsAmostra->rule_applied }}
+            </div>
+            @endif
+
+            @if(isset($amostra['justificativa_expurgo']) && $amostra['justificativa_expurgo'])
+            <div>
+                <strong>Justificativa:</strong> {{ $amostra['justificativa_expurgo'] }}
+            </div>
+            @endif
+
+            @if($logsAmostra && $logsAmostra->usuario_nome)
+            <div style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #d1d5db; color: #666;">
+                Responsável: {{ $logsAmostra->usuario_nome }}
+            </div>
+            @endif
+        </div>
+        @endif
+    </div>
+    @endforeach
+
+    @if($item->justificativa_cotacao)
+    <div class="justificativa-box" style="margin-top: 15px;">
+        <h4 style="font-size: 9pt; margin-bottom: 5px;">JUSTIFICATIVA</h4>
+        <p style="font-size: 8pt;">{{ $item->justificativa_cotacao }}</p>
+    </div>
+    @endif
+
+    @endif {{-- FIM: @if($item->estatisticas) da linha 450 --}}
+</div>
+@endif {{-- FIM: @if($item->estatisticas) da linha 425 --}}
+@endforeach
+
+{{-- ========================================
+     PÁGINA: ITENS SEM AMOSTRAS (consolidados em uma única página)
+     ======================================== --}}
+@php
+    $itensSemAmostras = $orcamento->itens->filter(fn($item) => !$item->estatisticas);
+@endphp
+
+@if($itensSemAmostras->count() > 0)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">3 - ITENS SEM AMOSTRAS DE PREÇOS</div>
+
+    <p style="margin: 10px 0; font-size: 9pt; text-align: justify; line-height: 1.6; background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107;">
+        <strong>⚠️ ATENÇÃO:</strong> Os itens listados abaixo ainda NÃO possuem amostras de preços coletadas.
+        Para que o orçamento seja concluído corretamente, é necessário realizar a pesquisa de preços para estes itens
+        através das fontes disponíveis (PNCP, Compras.gov, CDF, E-commerce, etc.).
+    </p>
+
+    @foreach($itensSemAmostras as $item)
+    <div style="margin: 15px 0; padding: 15px; background: #ffebee; border: 1px solid #f44336; border-radius: 5px; page-break-inside: avoid;">
+        <table style="border: none; font-size: 9pt;">
+            <tr>
+                <td style="width: 100px; font-weight: bold; border: none;">LOTE/ITEM:</td>
+                <td style="border: none;">{{ ($item->lote_id ? str_pad($item->lote->numero ?? '00', 2, '0', STR_PAD_LEFT) : '00') . '/' . str_pad($item->numero_item ?? '001', 3, '0', STR_PAD_LEFT) }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; border: none;">DESCRIÇÃO:</td>
+                <td style="border: none;">{{ $item->descricao }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; border: none;">QUANTIDADE:</td>
+                <td style="border: none;">{{ number_format($item->quantidade, 2, ',', '.') }} {{ $item->medida_fornecimento }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; border: none;">STATUS:</td>
+                <td style="border: none; color: #c62828;"><strong>❌ SEM AMOSTRAS COLETADAS</strong></td>
+            </tr>
+        </table>
+    </div>
+    @endforeach
+
+    <div style="margin-top: 20px; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; font-size: 8pt;">
+        <strong>📌 PRÓXIMOS PASSOS:</strong>
+        <ul style="margin: 5px 0 0 20px;">
+            <li>Acesse o modal de "Pesquisa de Preços" para cada item</li>
+            <li>Realize buscas em: PNCP, Painel de Preços, Cotação Direta com Fornecedores</li>
+            <li>Após coletar ao menos {{ $orcamento->numero_minimo_amostras ?? 3 }} amostras, o item aparecerá na seção de análise</li>
+        </ul>
+    </div>
+</div>
+@endif
+
+{{-- ========================================
+     PÁGINA: VALIDAÇÃO DAS COTAÇÕES DIRETAS (CDF)
+     ======================================== --}}
+@if(isset($solicitacoesCDF) && count($solicitacoesCDF) > 0)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">4 - VALIDAÇÃO DAS COTAÇÕES DIRETAS COM FORNECEDORES (CDF)</div>
+
+    <p style="margin: 10px 0; font-size: 9pt; text-align: justify; line-height: 1.6;">
+        As cotações diretas com fornecedores (CDF) constituem uma das fontes de pesquisa de preços previstas no art. 23, § 1º, inciso III da Lei nº 14.133/2021.
+        Abaixo estão listadas as solicitações de cotação enviadas a fornecedores, com indicação do status, prazo de resposta e itens cotados.
+    </p>
+
+    @foreach($solicitacoesCDF as $cdf)
+    @php
+        // Buscar itens relacionados à CDF
+        $itensCDF = DB::table('solicitacao_cdf_itens')
+            ->where('solicitacao_cdf_id', $cdf->id)
+            ->get();
+
+        $totalItensCDF = count($itensCDF);
+    @endphp
+
+    <div style="margin: 15px 0; page-break-inside: avoid;">
+        <h3 style="font-size: 10pt; background: #e0e0e0; padding: 5px; margin-bottom: 8px;">
+            SOLICITAÇÃO CDF #{{ str_pad($cdf->id, 4, '0', STR_PAD_LEFT) }}
+        </h3>
+
+        <table style="font-size: 8pt;">
+            <tr>
+                <td style="width: 150px; font-weight: bold;">FORNECEDOR:</td>
+                <td colspan="3">{{ $cdf->razao_social ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">CNPJ:</td>
+                <td>{{ $cdf->cnpj ?? 'N/A' }}</td>
+                <td style="width: 150px; font-weight: bold;">STATUS:</td>
+                <td style="font-weight: bold; text-transform: uppercase;">
+                    @if($cdf->status === 'respondido')
+                        <span class="badge-validada">RESPONDIDO</span>
+                    @elseif($cdf->status === 'pendente')
+                        <span style="background: #fff; color: #000; padding: 3px 8px; border: 1px solid #000;">PENDENTE</span>
+                    @else
+                        {{ strtoupper($cdf->status ?? 'N/A') }}
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">E-MAIL:</td>
+                <td>{{ $cdf->email ?? 'N/A' }}</td>
+                <td style="font-weight: bold;">TELEFONE:</td>
+                <td>{{ $cdf->telefone ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">DATA SOLICITAÇÃO:</td>
+                <td>{{ $cdf->created_at ? \Carbon\Carbon::parse($cdf->created_at)->format('d/m/Y H:i') : 'N/A' }}</td>
+                <td style="font-weight: bold;">PRAZO RESPOSTA:</td>
+                <td>{{ $cdf->prazo_resposta_dias ?? 'N/A' }} dias</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">PRAZO ENTREGA:</td>
+                <td>{{ $cdf->prazo_entrega_dias ?? 'N/A' }} dias</td>
+                <td style="font-weight: bold;">FRETE:</td>
+                <td>{{ strtoupper($cdf->frete ?? 'N/A') }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">TOTAL DE ITENS:</td>
+                <td colspan="3"><strong>{{ $totalItensCDF }}</strong> item(ns) cotado(s)</td>
+            </tr>
+        </table>
+
+        {{-- JUSTIFICATIVAS --}}
+        @if($cdf->justificativa_fornecedor_unico || $cdf->justificativa_produto_exclusivo || $cdf->justificativa_urgencia || $cdf->justificativa_melhor_preco || $cdf->justificativa_outro)
+        <h4 style="font-size: 9pt; margin: 10px 0 5px 0; font-weight: bold;">JUSTIFICATIVAS DA ESCOLHA DO FORNECEDOR:</h4>
+        <table style="font-size: 8pt;">
+            @if($cdf->justificativa_fornecedor_unico)
+            <tr>
+                <td style="width: 30px; text-align: center;">☑</td>
+                <td>Fornecedor único / exclusivo</td>
+            </tr>
+            @endif
+            @if($cdf->justificativa_produto_exclusivo)
+            <tr>
+                <td style="width: 30px; text-align: center;">☑</td>
+                <td>Produto exclusivo / marca específica</td>
+            </tr>
+            @endif
+            @if($cdf->justificativa_urgencia)
+            <tr>
+                <td style="width: 30px; text-align: center;">☑</td>
+                <td>Urgência / prazo de entrega</td>
+            </tr>
+            @endif
+            @if($cdf->justificativa_melhor_preco)
+            <tr>
+                <td style="width: 30px; text-align: center;">☑</td>
+                <td>Melhor preço verificado</td>
+            </tr>
+            @endif
+            @if($cdf->justificativa_outro)
+            <tr>
+                <td style="width: 30px; text-align: center;">☑</td>
+                <td><strong>Outra justificativa:</strong> {{ $cdf->justificativa_outro }}</td>
+            </tr>
+            @endif
+        </table>
+        @endif
+
+        {{-- CONDIÇÕES COMERCIAIS COMPLETAS --}}
+        <h4 style="font-size: 9pt; margin: 10px 0 5px 0; font-weight: bold;">CONDIÇÕES COMERCIAIS:</h4>
+        <table style="font-size: 8pt;">
+            @if($cdf->condicao_pagamento)
+            <tr>
+                <td style="width: 150px; font-weight: bold;">CONDIÇÃO DE PAGAMENTO:</td>
+                <td colspan="3">{{ $cdf->condicao_pagamento }}</td>
+            </tr>
+            @endif
+            <tr>
+                <td style="width: 150px; font-weight: bold;">FRETE:</td>
+                <td>{{ strtoupper($cdf->frete_tipo ?? $cdf->frete ?? 'N/A') }}</td>
+                @if($cdf->frete_valor)
+                <td style="width: 150px; font-weight: bold;">VALOR DO FRETE:</td>
+                <td>R$ {{ number_format($cdf->frete_valor, 2, ',', '.') }}</td>
+                @else
+                <td colspan="2"></td>
+                @endif
+            </tr>
+            @if($cdf->garantia_meses)
+            <tr>
+                <td style="font-weight: bold;">GARANTIA:</td>
+                <td colspan="3">{{ $cdf->garantia_meses }} {{ $cdf->garantia_meses == 1 ? 'mês' : 'meses' }}</td>
+            </tr>
+            @endif
+            @if($cdf->observacao)
+            <tr>
+                <td style="font-weight: bold; vertical-align: top;">OBSERVAÇÕES:</td>
+                <td colspan="3">{{ $cdf->observacao }}</td>
+            </tr>
+            @endif
+        </table>
+
+        {{-- ESPELHO CNPJ --}}
+        @if($cdf->arquivo_cnpj)
+        <h4 style="font-size: 9pt; margin: 10px 0 5px 0; font-weight: bold;">ESPELHO CNPJ:</h4>
+        <p style="font-size: 8pt; margin: 5px 0;">
+            <strong>Arquivo anexado:</strong> {{ basename($cdf->arquivo_cnpj) }}
+            <br><small style="color: #666;">Caminho: {{ $cdf->arquivo_cnpj }}</small>
+        </p>
+        @endif
+
+        @if($totalItensCDF > 0)
+        <p style="margin: 8px 0 5px 0; font-size: 8pt; font-weight: bold;">ITENS COTADOS NESTA SOLICITAÇÃO:</p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 8pt;">
+            @foreach($itensCDF as $itemCDF)
+                @php
+                    $itemOrcamento = $orcamento->itens->firstWhere('id', $itemCDF->orcamento_item_id);
+                @endphp
+                @if($itemOrcamento)
+                <li style="margin: 2px 0;">
+                    <strong>Item {{ str_pad($itemOrcamento->numero_item ?? '001', 3, '0', STR_PAD_LEFT) }}:</strong>
+                    {{ strlen($itemOrcamento->descricao) > 80 ? substr($itemOrcamento->descricao, 0, 80) . '...' : $itemOrcamento->descricao }}
+                </li>
+                @endif
+            @endforeach
+        </ul>
+        @endif
+    </div>
+    @endforeach
+</div>
+@endif
+
+{{-- ========================================
+     PÁGINA: CURVA ABC
+     ======================================== --}}
+@if(count($curvaABC) > 0)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">4 - CURVA ABC (ANÁLISE DE PARETO)</div>
+
+    <p style="margin: 10px 0; font-size: 9pt; text-align: justify; line-height: 1.6;">
+        A Curva ABC classifica os itens do orçamento por ordem de impacto orçamentário, seguindo o princípio de Pareto (regra 80-20).
+        <strong>Classe A</strong> representa os itens que, somados, correspondem a até 80% do valor total do orçamento;
+        <strong>Classe B</strong> representa os itens que somam de 80% a 95%; e
+        <strong>Classe C</strong> representa os itens que somam acima de 95%.
+        Esta classificação auxilia na priorização de esforços de negociação e controle.
+    </p>
+
+    <table style="margin-top: 15px;">
+        <thead>
+            <tr>
+                <th style="width: 8%; text-align: center;">ITEM</th>
+                <th style="width: 42%;">DESCRIÇÃO</th>
+                <th style="width: 15%; text-align: right;">VALOR TOTAL</th>
+                <th style="width: 12%; text-align: center;">% PARTIC.</th>
+                <th style="width: 12%; text-align: center;">% ACUM.</th>
+                <th style="width: 11%; text-align: center;">CLASSE</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($curvaABC as $item)
+            <tr>
+                <td style="text-align: center;">{{ str_pad($item['numero_item'] ?? '001', 3, '0', STR_PAD_LEFT) }}</td>
+                <td>{{ strlen($item['descricao']) > 60 ? substr($item['descricao'], 0, 60) . '...' : $item['descricao'] }}</td>
+                <td style="text-align: right; font-weight: bold;">R$ {{ number_format($item['valor_total'] ?? 0, 2, ',', '.') }}</td>
+                <td style="text-align: center;">{{ number_format($item['participacao'], 2, ',', '.') }}%</td>
+                <td style="text-align: center;">{{ number_format($item['participacao_acumulada'], 2, ',', '.') }}%</td>
+                <td style="text-align: center; font-weight: bold; font-size: 11pt;">
+                    {{ $item['faixa'] }}
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    {{-- LEGENDA E INTERPRETAÇÃO DA CURVA ABC --}}
+    <div style="margin-top: 20px; border: 2px solid #000000; padding: 15px; background: #FFFFFF; page-break-inside: avoid;">
+        <h3 style="font-size: 10pt; margin: 0 0 10px 0; font-weight: bold; text-align: center;">
+            INTERPRETAÇÃO E APLICAÇÃO DA CURVA ABC
+        </h3>
+
+        <div style="font-size: 9pt; line-height: 1.5;">
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>Classe A (0% a 80% acumulado):</strong> Representa os itens de maior impacto financeiro no orçamento.
+                Geralmente corresponde a aproximadamente 20% dos itens que representam 80% do valor total (Princípio de Pareto).
+                <strong>Recomendação:</strong> Priorizar negociação, realizar pesquisa de preços mais ampla, buscar alternativas técnicas e econômicas.
+                Estes itens merecem maior atenção e controle durante a execução contratual.
+            </p>
+
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>Classe B (80% a 95% acumulado):</strong> Representa os itens de impacto intermediário.
+                Correspondem a uma parcela moderada do valor total, situando-se entre os itens de alta e baixa relevância financeira.
+                <strong>Recomendação:</strong> Aplicar esforço moderado de negociação e controle, manter pesquisa de preços adequada,
+                realizar acompanhamento periódico durante a execução.
+            </p>
+
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>Classe C (95% a 100% acumulado):</strong> Representa os itens de menor impacto financeiro individual.
+                São numerosos mas representam pequena parcela do valor total.
+                <strong>Recomendação:</strong> Simplificar processos de cotação e controle, considerar agrupamento em lotes,
+                adotar procedimentos padronizados. O foco deve estar no controle administrativo eficiente.
+            </p>
+
+            <p style="margin: 12px 0 0 0; font-size: 8pt; font-style: italic; text-align: justify;">
+                <strong>Base Legal:</strong> A utilização da Curva ABC está alinhada com os princípios da eficiência e economicidade
+                previstos no art. 5º da Lei nº 14.133/2021. A classificação ABC permite alocar recursos de forma otimizada,
+                priorizando os itens de maior impacto orçamentário, conforme orientações do TCU (Acórdão nº 1.233/2012-Plenário).
+            </p>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- ========================================
+     PÁGINA: METODOLOGIA DA ORÇAMENTAÇÃO (NOVA SEÇÃO 5)
+     ======================================== --}}
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->razao_social ?? $orgao->nome_fantasia ?? 'ÓRGÃO') }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #000; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #000; margin: 3px 0;">{{ $orgao->endereco }}{{ $orgao->numero ? ', ' . $orgao->numero : '' }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #000; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #000; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">5 – METODOLOGIA DA ORÇAMENTAÇÃO</div>
+
+    <div style="margin-top: 15px; font-size: 10pt; line-height: 1.6; text-align: justify;">
+        @php
+            $metodologia = $orcamento->metodologia_analise_critica ?? null;
+            $medidaTendencia = $orcamento->medida_tendencia_central ?? null;
+            $limiteCv = '25%'; // Padrão, pois não há campo limite_cv no banco
+
+            // Traduzir medida de tendência central
+            $medidaTendenciaTexto = '—';
+            if ($medidaTendencia === 'MEDIA') {
+                $medidaTendenciaTexto = 'MÉDIA';
+            } elseif ($medidaTendencia === 'MEDIANA') {
+                $medidaTendenciaTexto = 'MEDIANA';
+            } elseif ($medidaTendencia === 'MENOR_PRECO') {
+                $medidaTendenciaTexto = 'MENOR PREÇO';
+            }
+        @endphp
+
+        @if($metodologia === 'DESVIO_PADRAO')
+            {{-- TEXTO A: Metodologia por Desvio-Padrão --}}
+            <p style="margin-bottom: 12px;">
+                Para a formação do preço estimado, adotou-se a <strong>metodologia de análise crítica por desvio-padrão</strong>, com avaliação estatística das amostras coletadas e identificação de valores atípicos. As amostras válidas foram consolidadas em torno de um intervalo calculado a partir da média e do desvio-padrão, permitindo a saneação (expurgo) de valores inconsistentes.
+            </p>
+
+            <p style="margin-bottom: 12px;">
+                O procedimento observou as seguintes etapas: (i) coleta de amostras em fontes oficiais e idôneas; (ii) normalização das unidades e quantidades; (iii) cálculo de média, mediana, desvio-padrão e coeficiente de variação (CV); (iv) definição dos limites inferior e superior com base em média ± desvio-padrão; (v) classificação das amostras como válidas ou expurgadas, com justificativa; e (vi) determinação da medida de tendência central para o preço estimado.
+            </p>
+
+            <p style="margin-bottom: 12px;">
+                Quando o coeficiente de variação não excede {{ $limiteCv }}, a dispersão é considerada aceitável. Nesse caso, a adoção da {{ $medidaTendenciaTexto }} assegura um valor representativo do mercado a partir das amostras saneadas. Em situações de maior dispersão, mantém-se a crítica das amostras e o método aqui descrito, preservando a rastreabilidade das decisões e a motivação do expurgo.
+            </p>
+
+            <p style="margin-bottom: 20px; font-weight: bold;">
+                A medida de tendência central adotada neste orçamento é {{ $medidaTendenciaTexto }}, aplicada sobre as amostras válidas após a análise por desvio-padrão e o respectivo saneamento.
+            </p>
+
+        @elseif($metodologia === 'MEDIA_SANEADA_POR_PERCENTUAL')
+            {{-- TEXTO B: Metodologia por Média Saneada por Percentual --}}
+            <p style="margin-bottom: 12px;">
+                Para a formação do preço estimado, adotou-se a <strong>metodologia de média saneada por percentual</strong>, com a remoção de valores extremos a partir de um critério percentual previamente definido. As amostras são normalizadas por unidade e quantidade e, em seguida, ordenadas para a aplicação do corte percentual, expurgando-se caudas inferiores/superiores que distorçam a tendência central.
+            </p>
+
+            <p style="margin-bottom: 12px;">
+                O procedimento observou as seguintes etapas: (i) coleta em fontes oficiais e idôneas; (ii) normalização de unidades; (iii) cálculo de média, mediana e coeficiente de variação (CV); (iv) aplicação de saneamento percentual (remoção de outliers conforme o critério configurado); (v) classificação das amostras como válidas ou expurgadas, com justificativa; e (vi) determinação da medida de tendência central para o preço estimado.
+            </p>
+
+            <p style="margin-bottom: 12px;">
+                Observado o coeficiente de variação e a quantidade mínima de amostras, a {{ $medidaTendenciaTexto }} é calculada sobre o conjunto saneado (após o corte percentual). Esse procedimento confere robustez ao preço estimado, reduzindo o impacto de outliers e mantendo a rastreabilidade das decisões de expurgo.
+            </p>
+
+            <p style="margin-bottom: 20px; font-weight: bold;">
+                A medida de tendência central adotada neste orçamento é {{ $medidaTendenciaTexto }}, calculada sobre as amostras válidas após a aplicação da média saneada por percentual.
+            </p>
+
+        @else
+            {{-- Caso metodologia não esteja definida --}}
+            <p style="margin-bottom: 12px; font-style: italic; color: #666;">
+                A metodologia de análise crítica não foi especificada para este orçamento.
+            </p>
+        @endif
+
+        {{-- SUMÁRIO TEXTUAL (sempre exibido após o corpo metodológico) --}}
+        <div style="margin-top: 30px; padding: 15px; background: #f9f9f9; border: 1px solid #000;">
+            <h3 style="font-size: 11pt; font-weight: bold; margin-bottom: 12px; text-align: center;">Sumário</h3>
+            <p style="margin: 4px 0; font-size: 9pt;">1 — Dados do Orçamento</p>
+            <p style="margin: 4px 0; font-size: 9pt;">2 — Preços Estimados</p>
+            <p style="margin: 4px 0; font-size: 9pt;">3 — Série de Preços Coletados</p>
+            <p style="margin: 4px 0; font-size: 9pt;">4 — Curva ABC</p>
+            <p style="margin: 4px 0; font-size: 9pt;">5 — Metodologia da Orçamentação</p>
+            <p style="margin: 4px 0; font-size: 9pt;">6 — Justificativas e Observações</p>
+            <p style="margin: 4px 0; font-size: 9pt;">7 — Anexos</p>
+        </div>
+    </div>
+
+    {{-- BLOCO DE ASSINATURA INSTITUCIONAL (final da página) --}}
+    @if($orgao)
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #000;">
+        <h3 style="font-size: 10pt; font-weight: bold; margin-bottom: 15px;">ASSINATURA</h3>
+
+        <div style="font-size: 9pt; line-height: 1.8;">
+            <p style="margin: 5px 0;">
+                <strong>Nome:</strong> {{ $orgao->responsavel_nome ?? '—' }}
+            </p>
+            <p style="margin: 5px 0;">
+                <strong>Matrícula/SIAPE:</strong> {{ $orgao->responsavel_matricula_siape ?? '—' }}
+            </p>
+            <p style="margin: 5px 0;">
+                <strong>Cargo/Função:</strong> {{ $orgao->responsavel_cargo ?? '—' }}
+            </p>
+            <p style="margin: 5px 0;">
+                <strong>Portaria nº:</strong> {{ $orgao->responsavel_portaria ?? '—' }}
+            </p>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; border-top: 1px solid #000; padding-top: 5px; width: 300px; margin-left: auto; margin-right: auto;">
+            <p style="font-size: 8pt; margin: 0;">Assinatura</p>
+        </div>
+    </div>
+    @endif
+</div>
+
+{{-- ========================================
+     PÁGINA: JUSTIFICATIVAS E OBSERVAÇÕES GLOBAIS
+     ======================================== --}}
+@if($orcamento->observacao_justificativa)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->razao_social ?? $orgao->nome_fantasia ?? 'ÓRGÃO') }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #000; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #000; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #000; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #000; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">6 - JUSTIFICATIVAS E OBSERVAÇÕES</div>
+
+    <div style="margin-top: 15px;">
+        <h3 style="font-size: 10pt; margin-bottom: 10px; font-weight: bold;">
+            CONSIDERAÇÕES GERAIS SOBRE O ORÇAMENTO
+        </h3>
+
+        <div class="justificativa-box" style="font-size: 9pt; line-height: 1.6; text-align: justify;">
+            {{ $orcamento->observacao_justificativa }}
+        </div>
+    </div>
+
+    @if($orcamento->usou_similares || $orcamento->usou_comprasgov || $orcamento->usou_cdf || $orcamento->usou_ecommerce)
+    <div style="margin-top: 20px;">
+        <h3 style="font-size: 10pt; margin-bottom: 10px; font-weight: bold;">
+            JUSTIFICATIVA DAS FONTES CONSULTADAS
+        </h3>
+
+        <div style="background: #FFFFFF; border: 1px solid #000000; padding: 12px; font-size: 9pt; line-height: 1.6;">
+            <p style="margin: 0 0 10px 0; text-align: justify;">
+                Em cumprimento ao art. 23, § 1º da Lei nº 14.133/2021, foram consultadas as seguintes fontes para elaboração
+                do orçamento estimativo:
+            </p>
+
+            @if($orcamento->usou_similares)
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>• Contratações Similares (PNCP):</strong> Consulta ao Portal Nacional de Contratações Públicas,
+                conforme inciso II do art. 23, § 1º. Utilizadas contratações similares realizadas por outros entes públicos,
+                validadas quanto à atualidade (prazo de {{ $orcamento->prazo_validade_amostras ?? 90 }} dias) e compatibilidade
+                com o objeto a ser contratado.
+            </p>
+            @endif
+
+            @if($orcamento->usou_comprasgov)
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>• Compras.gov.br:</strong> Consulta ao Painel de Preços do Governo Federal, base de dados oficial
+                que consolida informações de preços praticados em contratações públicas federais, estaduais e municipais.
+                Fonte prevista no art. 23, § 1º, inciso II.
+            </p>
+            @endif
+
+            @if($orcamento->usou_cdf)
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>• Cotação Direta com Fornecedores (CDF):</strong> Pesquisa com fornecedores do ramo pertinente ao objeto,
+                conforme inciso III do art. 23, § 1º. As cotações foram solicitadas formalmente, com especificação detalhada
+                do objeto, garantindo igualdade de condições e rastreabilidade.
+            </p>
+            @endif
+
+            @if($orcamento->usou_ecommerce)
+            <p style="margin: 8px 0; text-align: justify;">
+                <strong>• Sítios Eletrônicos (E-commerce):</strong> Consulta a sítios eletrônicos especializados ou de domínio amplo,
+                conforme inciso IV do art. 23, § 1º. Utilizados para validação de preços de mercado e verificação de disponibilidade
+                dos produtos/serviços.
+            </p>
+            @endif
+
+            <p style="margin: 12px 0 0 0; text-align: justify; font-style: italic; font-size: 8pt;">
+                A diversificação de fontes garante maior confiabilidade ao orçamento estimativo, permitindo análise comparativa
+                e identificação do melhor valor de referência para a contratação, em conformidade com os princípios da
+                economicidade e da busca pela proposta mais vantajosa para a Administração.
+            </p>
+        </div>
+    </div>
+    @endif
+</div>
+@endif
+
+{{-- ========================================
+     PÁGINA FINAL: JUSTIFICATIVA DA METODOLOGIA
+     ======================================== --}}
+@if($orcamento->usou_similares || $orcamento->usou_comprasgov || $orcamento->usou_cdf || $orcamento->usou_ecommerce || $orcamento->metodologia_analise_critica || $orcamento->medida_tendencia_central)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">5 - JUSTIFICATIVA DA METODOLOGIA UTILIZADA</div>
+
+    <div style="font-size: 9pt; text-align: justify; line-height: 1.6;">
+        <h3 style="font-size: 11pt; margin: 15px 0 10px 0;">5. METODOLOGIA DA ORÇAMENTAÇÃO</h3>
+
+        {{-- MÉTODOS APLICADOS --}}
+        <div style="background: #FFFFFF; padding: 12px; margin-bottom: 15px; border: 2px solid #000000;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #000000;">MÉTODOS APLICADOS NESTE ORÇAMENTO:</p>
+
+            <p style="margin: 0 0 4px 0;">
+                <strong>• Método de Juízo Crítico:</strong>
+                {{ $orcamento->metodologia_analise_critica === 'DP_MEDIA' ? 'Saneamento pelo Desvio-Padrão (DP ± MÉDIA)' : 'Saneamento por Percentual da Mediana' }}
+            </p>
+
+            <p style="margin: 0 0 4px 0;">
+                <strong>• Método de Obtenção de Preço:</strong>
+                {{ $orcamento->medida_tendencia_central ? ucfirst($orcamento->medida_tendencia_central) : 'Automático (CV ≤ 25% → Média, > 25% → Mediana)' }}
+            </p>
+
+            <p style="margin: 0;">
+                <strong>• Padrão de Casas Decimais:</strong>
+                {{ $orcamento->casas_decimais === 'quatro' ? 'Quatro (4)' : 'Duas (2)' }}
+            </p>
+        </div>
+
+        {{-- FONTES CONSULTADAS --}}
+        <div style="background: #FFFFFF; padding: 12px; margin-bottom: 15px; border: 2px solid #000000;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #000000;">FONTES CONSULTADAS:</p>
+
+            @php
+                $fontesConsultadas = [];
+                if($orcamento->usou_similares) $fontesConsultadas[] = 'Portal Nacional de Contratações Públicas (PNCP)';
+                if($orcamento->usou_comprasgov) $fontesConsultadas[] = 'Compras.gov.br';
+                if($orcamento->usou_ecommerce) $fontesConsultadas[] = 'E-commerce (Mercado Livre, Amazon, etc.)';
+                if($orcamento->usou_cdf) $fontesConsultadas[] = 'Cotação Direta com Fornecedores (CDF)';
+            @endphp
+
+            @if(count($fontesConsultadas) > 0)
+                @foreach($fontesConsultadas as $fonte)
+                <p style="margin: 0 0 4px 0;">✓ {{ $fonte }}</p>
+                @endforeach
+            @else
+                <p style="margin: 0;">Não especificadas</p>
+            @endif
+        </div>
+
+        <p style="margin-bottom: 10px;"><strong>5.1. BASE LEGAL E JURISPRUDENCIAL.</strong> A metodologia para elaboração do orçamento estimativo utilizada pelo Sistema Cesta de Preços (SCP) é estruturada com aderência aos seguintes diplomas legais e normativos:</p>
+
+        <div style="background: #FFFFFF; border: 1px solid #000000; padding: 12px; margin: 10px 0 15px 0; font-size: 9pt;">
+            <p style="margin: 0 0 8px 0;"><strong>• Lei nº 14.133/2021 (Nova Lei de Licitações e Contratos):</strong></p>
+            <ul style="margin: 0 0 10px 20px; padding: 0;">
+                <li style="margin: 3px 0;">Art. 23: Dispõe sobre a estimativa de preços, estabelecendo a obrigatoriedade de pesquisa prévia à contratação;</li>
+                <li style="margin: 3px 0;">Art. 23, § 1º: Define os parâmetros admissíveis para pesquisa de preços (incisos I a VI);</li>
+                <li style="margin: 3px 0;">Art. 5º: Estabelece os princípios norteadores (legalidade, impessoalidade, moralidade, publicidade, eficiência, interesse público, economicidade);</li>
+                <li style="margin: 3px 0;">Art. 11: Regulamenta o orçamento estimado em licitações.</li>
+            </ul>
+
+            <p style="margin: 8px 0;"><strong>• Instrução Normativa SEGES/ME nº 65, de 7 de julho de 2021:</strong></p>
+            <ul style="margin: 0 0 10px 20px; padding: 0;">
+                <li style="margin: 3px 0;">Dispõe sobre procedimentos administrativos básicos para a realização de pesquisa de preços para a aquisição de bens e contratação de serviços;</li>
+                <li style="margin: 3px 0;">Art. 5º: Estabelece métodos para realização da pesquisa de preços;</li>
+                <li style="margin: 3px 0;">Art. 6º: Define critérios de validação de amostras;</li>
+                <li style="margin: 3px 0;">Art. 7º: Orienta sobre tratamento estatístico de dados coletados.</li>
+            </ul>
+
+            <p style="margin: 8px 0;"><strong>• Manual de Orientações sobre Pesquisas de Preços - STJ (2021):</strong></p>
+            <ul style="margin: 0 0 10px 20px; padding: 0;">
+                <li style="margin: 3px 0;">Critérios de escolha entre média e mediana com base no coeficiente de variação (CV ≤ 25%);</li>
+                <li style="margin: 3px 0;">Metodologias de expurgo de amostras discrepantes (outliers);</li>
+                <li style="margin: 3px 0;">Tratamento estatístico de séries de preços.</li>
+            </ul>
+
+            <p style="margin: 8px 0;"><strong>• Jurisprudência do Tribunal de Contas da União (TCU):</strong></p>
+            <ul style="margin: 0 0 0 20px; padding: 0;">
+                <li style="margin: 3px 0;">Acórdão nº 1.233/2012-Plenário: Orientações sobre pesquisa de preços e estimativa em licitações;</li>
+                <li style="margin: 3px 0;">Acórdão nº 2.622/2014-Plenário: Critérios para validação de amostras em contratações públicas;</li>
+                <li style="margin: 3px 0;">Acórdão nº 1.455/2018-Plenário: Metodologia de tratamento estatístico de preços;</li>
+                <li style="margin: 3px 0;">Súmula nº 259: "Nas licitações, é vedada a fixação de preços mínimos, critérios estatísticos ou faixas de variação em relação a preços de referência".</li>
+            </ul>
+        </div>
+
+        <p style="margin-bottom: 10px;"><strong>5.2. DETALHAMENTO DA METODOLOGIA.</strong> 5.2.1. Da competência para elaboração do orçamento estimativo: os normativos internos do ente público devem definir o responsável pela elaboração do orçamento (doravante designado 'orçamentista'), com as respectivas competência. 5.2.2. Do respeito ao princípio da segregação das funções: O orçamentista não pode exercer, no âmbito do órgão pesquisante, a função de ordenador de despesas, procurador, controlador, agente de contratação, membro de comissão de licitação, pregoeiro, membro de apoio ao pregoeiro.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.3. Dos parâmetros de pesquisa utilizados pelo SCP:</strong> de acordo com o art. 23, § 1º, o SCP utiliza os seguintes parâmetros de pesquisa:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.3.1.</strong> contratações similares feitas pela Administração Pública (inciso II), retirada de fontes oficiais (Comprasnet, Banco de Preços da Saúde e outros repositórios públicos) com indicação específica para validação da informação, bem como a inclusão de contrato ou ata de registro de preços pelo usuário;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.3.2.</strong> pesquisa direta com fornecedores (inciso III), mediante cotação realizada pelo usuário, com validação da área de atuação, dados do fornecedor e elementos formais;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.3.3.</strong> sítios eletrônicos especializados ou de domínio amplo (IV), incluídos pelo usuário, com indicação do endereço eletrônico e data da captura da informação.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.4.</strong> O SCP sugere ao orçamentista, em suas pesquisas, priorize a utilização de contratações similares feitas pela Administração Pública como parâmetro de pesquisa preferencial.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.5.</strong> A eventual indicação de marca ou fabricante de referência para o item pesquisado, salvo parecer técnico em contrário, serve apenas como forma ou parâmetro de qualidade para facilitar a descrição do objeto, sendo admitida a cotação de objetos equivalentes, similares ou de melhor qualidade (conforme Acórdão nº 808/2019 do Plenário do Tribunal de Contas da União).</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.6. Na elaboração do orçamento estimativo, deve-se utilizar amostras atuais,</strong> assim entendidas:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.6.1.</strong> para contratações similares feitas pela Administração Pública, os contratos ou atas de registro de preços devem estar execução ou concluídas no período de 1 (um) ano anterior à data da realização da coleta das amostras (Lei n° 14.133/21, art. 23, § 1º, II), tomando-se por marco temporal a data de publicação da ata ou do contrato e, na falta desse, a data de homologação;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.6.2.</strong> para pesquisa direta com fornecedores, as cotações devem ter, no máximo, 6 (seis) meses de antecedência da data de divulgação do edital (Lei n° 14.133/21, art. 23, § 1º, IV).</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.7.</strong> A amplitude da pesquisa é assegurada pela utilização de três amostras válidas. Caso não seja possível esse número mínimo de amostras, é preciso apresentar justificativa idônea (Acórdão TCU 2531/2011-Plenário).</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.1.</strong> na média saneada por percentual da média, o sistema ordena as amostras em ordem crescente (população amostral inicial);</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.1.1.</strong> segundo, exclui as amostras inexequíveis, assim consideradas aquelas cujo valor seja 70% (setenta) inferior à mediana população amostral inicial, exclusive seu valor;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.1.2.</strong> terceiro, exclui as amostras com sobrepreço, assim consideradas aquelas cujo valor seja 30% (trinta por cento) superior à mediana da população amostral inicial, exclusive seu valor;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.1.3.</strong> O SCP usa o método adotado pelo Manual de Orientação de Pesquisa de Preços do STJ adaptado, usando como referência a mediana ao invés da média, por entender ser uma metodologia mais conservadora, posto que sujeita a menores variações de valores extremos.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.2.</strong> na média saneada pelo desvio-padrão, o sistema:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.2.1.</strong> cria um limite superior, que é representado pelo desvio-padrão somado à média;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.2.2.</strong> cria um limite inferior, que é representado pelo desvio-padrão menos a média;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.8.2.3.</strong> exclui do cálculo todas as amostras acima e abaixo dos limites estabelecidos.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.9.</strong> Após o juízo crítico, o SCP calcula o preço de referência por meio da escolha da medida de tendência central (média ou mediana) mais ajustada ao perfil das amostras saneadas, utilizando o coeficiente de variação como critério de escolha a partir dos padrões indicados no Manual de Orientações sobre Pesquisas de Preços, publicado pelo do Superior Tribunal de Justiça, a saber:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.9.1.</strong> se o coeficiente de variação for menor ou igual a 25% (vinte e cinco por cento), deve se estimar o preço de referência a partir da média aritmética (simples);</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.9.2.</strong> se o coeficiente de variação for maior que 25% (vinte e cinco por cento), deve se estimar o preço de referência a partir da mediana.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.2.9.3.</strong> O SCP permite que ao orçamentista atribuir o tipo de medida de tendência central a ser utilizada para o cálculo do preço referencial de forma manual e linear para todos os itens.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3. DAS RESPONSABILIDADES DO SCP.</strong></p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3.1.</strong> O SCP responsabiliza-se:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3.1.1.</strong> Pela arquitetura de sua metodologia de orçamentação;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3.1.2.</strong> Pela veracidade das amostras capturadas e arquivadas em seu banco de dados sob o parâmetro "outras contratações públicas", já que somente se utiliza de dados capturados a partir de licitações cujos resultados foram publicados em diário oficial e não são editáveis pelos usuários.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3.2.</strong> O SCP não se responsabiliza:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3.2.1.</strong> Pela higidez dos procedimentos licitatórios que deram origem aos preços registrados e publicados, sendo de reponsabilidade dos respectivos órgãos públicos que divulgaram a informação;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.3.2.2.</strong> Pela veracidade dos dados dos contratos e atas de registro de preços inseridas pelo orçamentista, por pesquisa direta com fornecedores e por pesquisa oriundas de sítios eletrônicos especializados ou de domínio amplo, vendo a veracidade de tais dados de responsabilidade do orçamentista.</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4. DAS RESPONSABILIDADES DO USUÁRIO.</strong></p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.</strong> O orçamentista é responsável por:</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.1.</strong> manter seu login/senha em sigilo, não devendo transferir nem compartilhar seu acesso individual, sob pena de responsabilidade pessoal;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.2.</strong> reproduzir correta e adequadamente os itens a serem orçados de acordo com o termo de referência, projeto básico ou documento equivalente apresentado pela Unidade Interessada;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.3.</strong> solicitar esclarecimento à Unidade Interessada sempre que observar qualquer impropriedade nos dados constantes da solicitação ou da descrição dos itens a serem orçados;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.4.</strong> selecionar amostras que, dentro do eixo de variação constante do banco de dados, representem tanto quanto possível a realidade do preço de mercado local, considerando o porte dos órgãos, logística, quantitativo total, unitário, distância dos centros distribuidores etc;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.5.</strong> em relação à pesquisa direta com fornecedores, o orçamentista é responsável por solicitar formalmente a cotação de preços, juntando o comprovante (contrafé, e-mail ou AR) no sistema; selecionar os fornecedores a serem consultados, mediante justificativa; fixar o prazo para resposta ao pedido de cotação proporcional à complexidade do objeto; validar os pontos de controle previstos pelo SCP; anexar ao processo a resposta do fornecedor (ofícios, e-mails de solicitação, cotação de preços etc.) ou certificar a não resposta;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.6.</strong> O usuário deve verificar a data de validade da ata ou da vigência do contrato;</p>
+
+        <p style="margin-bottom: 10px;"><strong>5.4.1.7.</strong> rubricar toda a documentação que subsidiou a pesquisa e assinar o orçamento ao final.</p>
+
+        <p style="margin-top: 20px; font-weight: bold;">A Metodologia utilizada na elaboração do presente orçamento estimativo tem aderência à Lei n º 14.133, de 1º de abril de 2021 (Lei de Licitações e Contratos Administrativos), art. 23, especialmente no que tange às fontes de pesquisa admitidas (§ 1º).</p>
+
+        {{-- SUMÁRIO TEXTUAL DAS SEÇÕES --}}
+        <div style="background: #FFFFFF; border: 2px solid #000000; padding: 15px; margin-top: 25px;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 10pt;">As seções deste orçamento incluem:</p>
+            <p style="margin: 0 0 4px 0;">1 — Dados do Orçamento</p>
+            <p style="margin: 0 0 4px 0;">2 — Preços Estimados</p>
+            <p style="margin: 0 0 4px 0;">3 — Série de Preços Coletados</p>
+            <p style="margin: 0 0 4px 0;">4 — Curva ABC</p>
+            <p style="margin: 0;">5 — Justificativa da Metodologia Utilizada</p>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- ========================================
+     PÁGINA: ANEXOS
+     ======================================== --}}
+@if(isset($anexos) && count($anexos) > 0)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">7 - ANEXOS E DOCUMENTOS CONSULTADOS</div>
+
+    <p style="margin: 10px 0; font-size: 9pt; text-align: justify; line-height: 1.6;">
+        Relação de documentos anexados ao processo de orçamentação, incluindo prints de tela, propostas comerciais,
+        documentação técnica e demais comprovantes que fundamentam a pesquisa de preços realizada.
+    </p>
+
+    <table style="margin-top: 15px; font-size: 8pt;">
+        <thead>
+            <tr>
+                <th style="width: 8%; text-align: center;">Nº</th>
+                <th style="width: 35%;">ARQUIVO / ORIGEM</th>
+                <th style="width: 22%;">TIPO</th>
+                <th style="width: 20%;">DATA/HORA</th>
+                <th style="width: 15%;">TAMANHO</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($anexos as $idx => $anexo)
+            <tr>
+                <td style="text-align: center;">{{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}</td>
+                <td>
+                    <strong>{{ $anexo['nome_arquivo'] ?? 'Documento anexado' }}</strong>
+                    <br><small style="color: #666; font-size: 7pt;">Origem: {{ $anexo['origem'] ?? 'N/A' }}</small>
+                </td>
+                <td>{{ $anexo['tipo_label'] ?? strtoupper($anexo['tipo'] ?? 'DOCUMENTO') }}</td>
+                <td>{{ $anexo['data_upload'] ?? 'N/A' }}</td>
+                <td style="word-break: break-all; font-size: 7pt;">
+                    {{ $anexo['tamanho'] ?? 'N/A' }}
+                    @if(isset($anexo['mime_type']))
+                    <br><small style="color: #666;">{{ $anexo['mime_type'] }}</small>
+                    @endif
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px; background: #FFFFFF; border: 1px solid #000000; padding: 10px; font-size: 8pt;">
+        <p style="margin: 0; font-style: italic;">
+            <strong>Observação:</strong> Os anexos listados acima fazem parte integrante deste orçamento estimativo
+            e foram utilizados como base para a pesquisa de preços. Todos os documentos estão disponíveis para
+            consulta e auditoria, conforme princípios da transparência e publicidade (art. 5º, Lei nº 14.133/2021).
+        </p>
+    </div>
+</div>
+@endif
+{{-- Removida página vazia de "Não há anexos" --}}
+
+{{-- ========================================
+     PÁGINA: ASSINATURA
+     ======================================== --}}
+{{-- ========================================
+     SEÇÃO 9: APÊNDICE - AUDITORIA E RASTREABILIDADE COMPLETA
+     Inserido antes da página de assinatura
+     ======================================== --}}
+@php
+    // Buscar TODOS os logs de auditoria do orçamento
+    $todosLogs = DB::table('audit_log_itens as log')
+        ->join('itens_orcamento as item', 'log.item_id', '=', 'item.id')
+        ->where('item.orcamento_id', $orcamento->id)
+        ->select(
+            'log.*',
+            'item.descricao as item_descricao',
+            'item.numero_item'
+        )
+        ->orderBy('log.created_at', 'desc')
+        ->get();
+
+    // Estatísticas globais
+    $totalAcoes = $todosLogs->count();
+    $totalExpurgos = $todosLogs->where('event_type', 'PURGE_SAMPLE')->count();
+    $totalRevalidacoes = $todosLogs->where('event_type', 'REVALIDATE_SAMPLE')->count();
+    $totalEdicoes = $todosLogs->where('event_type', 'EDIT_SAMPLE')->count();
+    $totalSnapshots = $todosLogs->where('event_type', 'FIX_SNAPSHOT')->count();
+    $totalPDFs = $todosLogs->where('event_type', 'GENERATE_PDF')->count();
+
+    // Top usuários
+    $topUsuarios = $todosLogs->groupBy('usuario_nome')
+        ->map(fn($logs) => $logs->count())
+        ->sortDesc()
+        ->take(5);
+
+    // Calcular hash SHA256 do PDF (simulado - em produção seria o hash real do arquivo)
+    $pdfContent = json_encode([
+        'orcamento_id' => $orcamento->id,
+        'numero' => $orcamento->numero,
+        'data_geracao' => now()->format('Y-m-d H:i:s'),
+        'total_itens' => $orcamento->itens->count(),
+        'total_logs' => $totalAcoes
+    ]);
+    $pdfHash = hash('sha256', $pdfContent);
+@endphp
+
+@if($totalAcoes > 0)
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="secao">9 - APÊNDICE: AUDITORIA E RASTREABILIDADE COMPLETA</div>
+
+    <p style="margin: 10px 0; font-size: 9pt; text-align: justify; line-height: 1.6;">
+        Este apêndice apresenta o registro completo de todas as ações de auditoria realizadas durante a elaboração
+        do orçamento estimativo, garantindo rastreabilidade, transparência e conformidade com os princípios da
+        Lei nº 14.133/2021. Todos os eventos registrados incluem timestamp, responsável, tipo de ação e justificativa.
+    </p>
+
+    {{-- ESTATÍSTICAS GLOBAIS DE AUDITORIA --}}
+    <div style="margin: 15px 0; background: #FFFFFF; border: 2px solid #000000; padding: 12px; page-break-inside: avoid;">
+        <h3 style="font-size: 10pt; margin: 0 0 10px 0; font-weight: bold;">
+            RESUMO ESTATÍSTICO DA AUDITORIA
+        </h3>
+
+        <table style="font-size: 9pt; border: 1px solid #000000;">
+            <tr>
+                <td style="width: 35%; font-weight: bold; background: #f5f5f5;">TOTAL DE AÇÕES REGISTRADAS:</td>
+                <td style="text-align: center; font-weight: bold; font-size: 14pt;">{{ $totalAcoes }}</td>
+                <td style="width: 35%; font-weight: bold; background: #f5f5f5;">TOTAL DE EXPURGOS:</td>
+                <td style="text-align: center; font-weight: bold; font-size: 14pt;">{{ $totalExpurgos }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f5f5f5;">TOTAL DE REVALIDAÇÕES:</td>
+                <td style="text-align: center; font-weight: bold; font-size: 14pt;">{{ $totalRevalidacoes }}</td>
+                <td style="font-weight: bold; background: #f5f5f5;">TOTAL DE EDIÇÕES:</td>
+                <td style="text-align: center; font-weight: bold; font-size: 14pt;">{{ $totalEdicoes }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f5f5f5;">TOTAL DE SNAPSHOTS:</td>
+                <td style="text-align: center; font-weight: bold; font-size: 14pt;">{{ $totalSnapshots }}</td>
+                <td style="font-weight: bold; background: #f5f5f5;">TOTAL DE PDFs GERADOS:</td>
+                <td style="text-align: center; font-weight: bold; font-size: 14pt;">{{ $totalPDFs }}</td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- TOP 5 USUÁRIOS MAIS ATIVOS --}}
+    @if($topUsuarios->count() > 0)
+    <div style="margin: 15px 0; background: #FFFFFF; border: 1px solid #000000; padding: 10px; page-break-inside: avoid;">
+        <h4 style="font-size: 9pt; margin: 0 0 8px 0; font-weight: bold;">TOP 5 USUÁRIOS MAIS ATIVOS:</h4>
+        <table style="font-size: 8pt; border: 1px solid #000000;">
+            <thead>
+                <tr style="background: #000000; color: #FFFFFF;">
+                    <th style="width: 10%; text-align: center;">#</th>
+                    <th style="width: 60%;">USUÁRIO</th>
+                    <th style="width: 30%; text-align: center;">TOTAL DE AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($topUsuarios as $usuarioNome => $totalAcoesUsuario)
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">{{ $loop->iteration }}º</td>
+                    <td>{{ $usuarioNome ?? 'N/A' }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ $totalAcoesUsuario }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+
+    {{-- LOG COMPLETO DE AUDITORIA (TABELA DETALHADA) --}}
+    <div style="margin: 20px 0;">
+        <h3 style="font-size: 10pt; margin: 0 0 10px 0; font-weight: bold; text-transform: uppercase;">
+            REGISTRO DETALHADO DE TODAS AS AÇÕES
+        </h3>
+
+        <table style="font-size: 7pt; border: 1px solid #000000;">
+            <thead>
+                <tr style="background: #000000; color: #FFFFFF;">
+                    <th style="width: 5%; text-align: center;">ID</th>
+                    <th style="width: 11%;">DATA/HORA</th>
+                    <th style="width: 15%;">USUÁRIO</th>
+                    <th style="width: 15%;">TIPO DE EVENTO</th>
+                    <th style="width: 8%; text-align: center;">ITEM</th>
+                    <th style="width: 6%; text-align: center;">AMOSTRA</th>
+                    <th style="width: 13%;">ANTES</th>
+                    <th style="width: 13%;">DEPOIS</th>
+                    <th style="width: 14%;">JUSTIFICATIVA</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($todosLogs as $log)
+                <tr>
+                    <td style="text-align: center;">{{ $log->id }}</td>
+                    <td>{{ \Carbon\Carbon::parse($log->created_at)->format('d/m/Y H:i:s') }}</td>
+                    <td>{{ $log->usuario_nome ?? 'Sistema' }}</td>
+                    <td>
+                        @php
+                            $eventosMap = [
+                                'APPLY_SANITIZATION_DP' => 'Saneamento DP±MEAN',
+                                'APPLY_SANITIZATION_MEDIAN' => 'Saneamento MEDIAN±PERC',
+                                'PURGE_SAMPLE' => 'Expurgo Manual',
+                                'REVALIDATE_SAMPLE' => 'Revalidar Amostra',
+                                'CHANGE_METHODOLOGY' => 'Mudar Metodologia',
+                                'ADJUST_CONVERSION' => 'Ajustar Conversão',
+                                'EDIT_SAMPLE' => 'Editar Amostra',
+                                'ADD_ATTACHMENT' => 'Adicionar Anexo',
+                                'REMOVE_ATTACHMENT' => 'Remover Anexo',
+                                'UPDATE_LINK_QR' => 'Atualizar Link/QR',
+                                'FIX_SNAPSHOT' => 'Fixar Snapshot',
+                                'GENERATE_PDF' => 'Gerar PDF'
+                            ];
+                        @endphp
+                        {{ $eventosMap[$log->event_type] ?? $log->event_type }}
+                    </td>
+                    <td style="text-align: center;">{{ str_pad($log->numero_item ?? '001', 3, '0', STR_PAD_LEFT) }}</td>
+                    <td style="text-align: center;">
+                        @if($log->sample_number)
+                            {{ str_pad($log->sample_number, 2, '0', STR_PAD_LEFT) }}
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>{{ Str::limit($log->before_value ?? '-', 30) }}</td>
+                    <td>{{ Str::limit($log->after_value ?? '-', 30) }}</td>
+                    <td>{{ Str::limit($log->justification ?? '-', 40) }}</td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 20px; font-style: italic; color: #666;">
+                        Nenhum registro de auditoria disponível.
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- PARÂMETROS DE CONFIGURAÇÃO UTILIZADOS --}}
+    <div style="margin: 20px 0; background: #FFFFFF; border: 2px solid #000000; padding: 12px; page-break-inside: avoid;">
+        <h3 style="font-size: 10pt; margin: 0 0 10px 0; font-weight: bold;">
+            PARÂMETROS DE CONFIGURAÇÃO DO ORÇAMENTO
+        </h3>
+
+        <table style="font-size: 8pt; border: 1px solid #000000;">
+            <tr>
+                <td style="width: 40%; font-weight: bold; background: #f5f5f5;">METODOLOGIA DE ANÁLISE CRÍTICA:</td>
+                <td>{{ $orcamento->metodologia_analise_critica === 'DP_MEDIA' ? 'Saneamento pelo Desvio-Padrão (DP ± MÉDIA)' : 'Saneamento por Percentual da Mediana' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f5f5f5;">MEDIDA DE TENDÊNCIA CENTRAL:</td>
+                <td>{{ $orcamento->medida_tendencia_central ? ucfirst($orcamento->medida_tendencia_central) : 'Automático (CV ≤ 25% → Média, > 25% → Mediana)' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f5f5f5;">CASAS DECIMAIS:</td>
+                <td>{{ $orcamento->casas_decimais === 'quatro' ? 'Quatro (4)' : 'Duas (2)' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f5f5f5;">NÚMERO MÍNIMO DE AMOSTRAS:</td>
+                <td>{{ $orcamento->numero_minimo_amostras ?? 3 }} amostras</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f5f5f5;">PRAZO DE VALIDADE DAS AMOSTRAS:</td>
+                <td>{{ $orcamento->prazo_validade_amostras ?? 90 }} dias</td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- HASH DE INTEGRIDADE DO PDF --}}
+    <div style="margin: 20px 0; background: #f5f5f5; border: 2px solid #000000; padding: 12px; page-break-inside: avoid;">
+        <h3 style="font-size: 10pt; margin: 0 0 8px 0; font-weight: bold;">
+            🔒 HASH DE INTEGRIDADE DO DOCUMENTO
+        </h3>
+
+        <p style="font-size: 8pt; margin: 5px 0; line-height: 1.5;">
+            <strong>Algoritmo:</strong> SHA256<br>
+            <strong>Data/Hora da Geração:</strong> {{ now()->format('d/m/Y H:i:s') }}<br>
+            <strong>Hash:</strong>
+        </p>
+
+        <div style="background: #FFFFFF; border: 1px solid #000000; padding: 8px; font-family: 'Courier New', monospace; font-size: 7pt; word-break: break-all; margin-top: 5px;">
+            {{ $pdfHash }}
+        </div>
+
+        <p style="font-size: 7pt; margin: 10px 0 0 0; font-style: italic; color: #666;">
+            Este hash SHA256 pode ser utilizado para verificar a integridade e autenticidade do documento PDF.
+            Qualquer alteração no documento resultará em um hash diferente, garantindo a rastreabilidade e
+            imutabilidade das informações apresentadas.
+        </p>
+    </div>
+
+    {{-- DECLARAÇÃO DE CONFORMIDADE --}}
+    <div style="margin: 20px 0; padding: 12px; border: 2px solid #000000; page-break-inside: avoid;">
+        <h3 style="font-size: 10pt; margin: 0 0 10px 0; font-weight: bold; text-align: center;">
+            DECLARAÇÃO DE CONFORMIDADE E RASTREABILIDADE
+        </h3>
+
+        <p style="font-size: 9pt; text-align: justify; line-height: 1.6; margin: 10px 0;">
+            Declaro que todas as ações de auditoria registradas neste apêndice foram realizadas em conformidade
+            com os princípios da <strong>Lei nº 14.133/2021</strong>, especialmente no que tange à
+            <strong>transparência</strong> (art. 5º), <strong>rastreabilidade</strong> e <strong>economicidade</strong>.
+        </p>
+
+        <p style="font-size: 9pt; text-align: justify; line-height: 1.6; margin: 10px 0;">
+            O sistema <strong>Cesta de Preços</strong> registra automaticamente todas as alterações realizadas
+            durante a elaboração do orçamento estimativo, incluindo expurgos de amostras, revalidações,
+            mudanças de metodologia e edições, garantindo plena rastreabilidade das decisões técnicas adotadas.
+        </p>
+
+        <p style="font-size: 9pt; text-align: justify; line-height: 1.6; margin: 10px 0;">
+            Este documento foi gerado eletronicamente pelo sistema e pode ser verificado através do hash SHA256
+            apresentado acima. A integridade dos dados de auditoria está preservada no banco de dados do sistema
+            e disponível para consulta e auditoria a qualquer momento.
+        </p>
+    </div>
+
+    {{-- ASSINATURAS --}}
+    <div style="margin-top: 60px;">
+        <div style="text-align: center;">
+            <div style="border-top: 2px solid #000000; width: 400px; margin: 0 auto; padding-top: 5px;">
+                <strong>{{ $orcamento->orcamentista_nome ?? $orcamento->usuario->name ?? 'ORÇAMENTISTA' }}</strong><br>
+                @if($orcamento->orcamentista_setor)
+                Cargo/Setor: {{ $orcamento->orcamentista_setor }}<br>
+                @endif
+                @php
+                    $cpfCnpj = $orcamento->orcamentista_cpf_cnpj ?? $orcamento->usuario->cpf ?? '000.000.000-00';
+                    $labelCpfCnpj = (strlen(preg_replace('/\D/', '', $cpfCnpj)) == 14) ? 'CNPJ' : 'CPF';
+                @endphp
+                {{ $labelCpfCnpj }}: {{ $cpfCnpj }}
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+<div class="page">
+    <div class="header">
+        @if($temBrasao)
+        <img src="{{ $brasaoAbsoluto }}" alt="Brasão" style="max-width: 80px; max-height: 80px; object-fit: contain; margin-bottom: 5px;">
+        @endif
+        @if($orgao)
+        <div style="text-align: center;">
+            <h1 style="margin: 0;">{{ strtoupper($orgao->nome) }}</h1>
+            @if($orgao->cnpj)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">CNPJ: {{ $orgao->cnpj }}</p>
+            @endif
+            @if($orgao->endereco)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->endereco }}</p>
+            @endif
+            @if($orgao->cidade && $orgao->uf)
+            <p style="font-size: 9pt; color: #666; margin: 3px 0;">{{ $orgao->cidade }} - {{ $orgao->uf }}</p>
+            @endif
+            @if($orgao->telefone || $orgao->email)
+            <p style="font-size: 8pt; color: #666; margin: 3px 0;">
+                @if($orgao->telefone){{ $orgao->telefone }}@endif
+                @if($orgao->telefone && $orgao->email) | @endif
+                @if($orgao->email){{ $orgao->email }}@endif
+            </p>
+            @endif
+        </div>
+        @endif
+        <p style="margin-top: 10px;"><strong>ORÇAMENTO #{{ $orcamento->numero }}</strong></p>
+    </div>
+
+    <div class="assinatura">
+        <div class="assinatura-linha">
+            @php
+                $nomeOrcamentista = $orcamento->orcamentista_nome ?? $orcamento->usuario->name ?? 'ORÇAMENTISTA';
+                $cpfMatricula = $orcamento->orcamentista_cpf_cnpj ?? $orcamento->usuario->cpf ?? '000.000.000-00';
+                $portaria = $orcamento->orcamentista_portaria ?? '000000/0000';
+            @endphp
+            <strong>{{ $nomeOrcamentista }}</strong><br>
+            CPF/Matrícula {{ $cpfMatricula }}<br>
+            Portaria nº {{ $portaria }}<br>
+            <br>
+            <small>Este orçamento foi gerado com o auxílio do Sistema Cesta de Preços.</small>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

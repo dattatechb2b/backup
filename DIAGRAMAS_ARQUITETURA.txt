@@ -1,0 +1,346 @@
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                     ARQUITETURA COMPLETA - CESTA DE PREÇOS                            ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                          CAMADA 1: CLIENTE / NAVEGADOR                                  │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐                     │
+│  │  HTML (Blade)    │  │  Alpine.js       │  │  Fetch API       │                     │
+│  │  - Tabelas       │  │  - Reatividade   │  │  - AJAX Calls    │                     │
+│  │  - Formulários   │  │  - Event Handler │  │  - 4 fontes      │                     │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘                     │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                        ↓ REQUISIÇÃO HTTP
+                                        
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                    CAMADA 2: PROXY DO MINHADATTATECH (AUTENTICAÇÃO)                     │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐  │
+│  │  1. Valida usuário (credenciais)                                              │  │
+│  │  2. Identifica tenant (prefeitura)                                            │  │
+│  │  3. Busca configuração BD do tenant                                           │  │
+│  │  4. Adiciona headers X-User-*, X-Tenant-*, X-DB-*                           │  │
+│  │  5. Encaminha requisição para módulo                                          │  │
+│  └─────────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                    ↓ Headers: X-User-Id, X-Tenant-*, X-DB-*
+                    
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                  CAMADA 3: MIDDLEWARE (AUTENTICAÇÃO + SESSÃO)                          │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌─────────────────────────┐                                                          │
+│  │ CleanDuplicateCookies   │ → Remove cookies duplicados                             │
+│  └─────────────────────────┘                                                          │
+│              ↓                                                                         │
+│  ┌─────────────────────────┐                                                          │
+│  │ StartSession            │ → Inicia sessão do Laravel                              │
+│  └─────────────────────────┘                                                          │
+│              ↓                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ ProxyAuth (CRÍTICO)                                                            │  │
+│  │  ├─ Verifica sessão válida (restaura contexto)                                 │  │
+│  │  ├─ Configura BD DINAMICAMENTE (pgsql)                                         │  │
+│  │  │  └─ config(['database.connections.pgsql' => ...])                           │  │
+│  │  │  └─ DB::purge('pgsql'); DB::reconnect('pgsql');                             │  │
+│  │  ├─ Cria/autentica usuário                                                     │  │
+│  │  └─ Salva contexto em sessão                                                   │  │
+│  └─────────────────────────────────────────────────────────────────────────────────┘  │
+│              ↓                                                                         │
+│  ┌─────────────────────────┐                                                          │
+│  │ ForceSaveSession        │ → Força persistência da sessão                          │
+│  └─────────────────────────┘                                                          │
+│              ↓                                                                         │
+│  ┌─────────────────────────┐                                                          │
+│  │ EnsureAuthenticated     │ → Verifica Auth::check()                                │
+│  └─────────────────────────┘                                                          │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                        ↓
+                                        
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│              CAMADA 4: ROTAS + CONTROLLERS (LÓGICA DE NEGÓCIO)                         │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ OrcamentoController (8.259 linhas)                                             │  │
+│  │ ├─ create()           - Formulário criação                                     │  │
+│  │ ├─ store()            - Salvar novo (valida + BD)                              │  │
+│  │ ├─ elaborar()         - TELA PRINCIPAL (AJAX-heavy)                            │  │
+│  │ ├─ storeItem()        - Adicionar item                                         │  │
+│  │ ├─ salvarPrecoItem()  - Salvar preço (MODAL)                                  │  │
+│  │ ├─ aplicarSaneamento() - Estatística (DP±μ)                                   │  │
+│  │ ├─ gerarPDF()         - Download PDF                                           │  │
+│  │ └─ concluir()         - Finalizar orçamento                                    │  │
+│  └─────────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ FornecedorController (2.605 linhas)                                            │  │
+│  │ ├─ index()            - Listar fornecedores                                    │  │
+│  │ ├─ importarPlanilha() - Importar Excel                                         │  │
+│  │ └─ consultarCNPJ()    - Receita Federal                                        │  │
+│  └─────────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ CdfRespostaController (550 linhas)                                             │  │
+│  │ ├─ listarCdfs()       - Listar CDFs                                            │  │
+│  │ ├─ exibirFormulario() - Formulário público (token)                             │  │
+│  │ └─ salvarResposta()   - Salvar resposta (PÚBLICO)                              │  │
+│  └─────────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                         │
+│  + 11 Controllers menores (PesquisaRapida, Catalogo, MapaAtas, etc)                   │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                        ↓
+                                        
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                   CAMADA 5: SERVICES (LÓGICA REUTILIZÁVEL)                            │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐       │
+│  │ EstatisticaService   │  │ CurvaABCService      │  │ CnpjService          │       │
+│  │ - Média              │  │ - Classificação A/B/C│  │ - Consulta CNPJ      │       │
+│  │ - Mediana            │  │ - Participação       │  │ - Validação          │       │
+│  │ - DP                 │  │ - Acumulada          │  │ - Extração dados     │       │
+│  │ - CV                 │  │                      │  │                      │       │
+│  │ - Saneamento (DP±μ)  │  │                      │  │                      │       │
+│  └──────────────────────┘  └──────────────────────┘  └──────────────────────┘       │
+│                                                                                         │
+│  ┌──────────────────────┐  ┌──────────────────────────────────────────────────────┐  │
+│  │ LicitaconService     │  │ PDFService (com detectores e extratores)            │  │
+│  │ - Busca contratos    │  │ - Detecta tipo documento (genérico, ARP, etc)      │  │
+│  │ - Cache              │  │ - Extrai dados estruturados                         │  │
+│  │ - API Licitação      │  │ - Retorna tabelas e itens                          │  │
+│  └──────────────────────┘  └──────────────────────────────────────────────────────┘  │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                        ↓
+                                        
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│              CAMADA 6: MODELS (ELOQUENT + RELACIONAMENTOS)                             │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌─────────────────────┐                                                              │
+│  │ Orcamento (raiz)    │                                                              │
+│  │ ├─ hasMany Items    │                                                              │
+│  │ ├─ hasMany Lotes    │                                                              │
+│  │ ├─ hasMany CDFs     │                                                              │
+│  │ ├─ hasManyContratos │                                                              │
+│  │ └─ belongsTo User   │                                                              │
+│  └─────────────────────┘                                                              │
+│           ↓ RELACIONAMENTOS                                                            │
+│           ├─ OrcamentoItem                                                             │
+│           │  ├─ preco_unitario (do usuário ou cotação)                                │
+│           │  ├─ calc_* (snapshot estatístico)                                         │
+│           │  └─ hasMany AuditLogItem                                                  │
+│           │                                                                            │
+│           ├─ SolicitacaoCDF                                                            │
+│           │  ├─ token_resposta (UUID único)                                           │
+│           │  ├─ valido_ate (data expiração)                                           │
+│           │  └─ hasOne RespostaCDF                                                    │
+│           │                                                                            │
+│           ├─ ContratacaoSimilar                                                        │
+│           │  └─ hasMany Items                                                         │
+│           │                                                                            │
+│           └─ ColetaEcommerce                                                           │
+│              └─ hasMany Items                                                         │
+│                                                                                         │
+│  + 24 Models adicionais (Fornecedor, CATMAT, Contrato PNCP, etc)                     │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                        ↓
+                                        
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                    CAMADA 7: BANCO DE DADOS (MULTITENANT)                             │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  PostgreSQL (3 Conexões)                                                               │
+│  ================================================================================       │
+│                                                                                         │
+│  Conexão 'pgsql' (DINÂMICA - configura em runtime)                                    │
+│  └─ Aponta para banco do tenant: {prefeitura}_{id}_db                                 │
+│     ├─ cp_orcamentos           (tabela principal)                                     │
+│     ├─ cp_itens_orcamento      (itens com snapshots)                                  │
+│     ├─ cp_solicitacoes_cdf     (CDFs)                                                 │
+│     ├─ cp_respostas_cdf        (respostas)                                            │
+│     ├─ cp_fornecedores         (cadastro)                                             │
+│     ├─ cp_usuarios             (usuários)                                             │
+│     ├─ audit_log_itens         (auditoria)                                            │
+│     └─ + 20 tabelas adicionais                                                        │
+│                                                                                         │
+│  Conexão 'pgsql_main' (FIXA - sempre minhadattatech_db)                               │
+│  └─ Banco central (compartilhado por todos tenants)                                   │
+│     ├─ cp_catmat               (50K+ materiais)                                       │
+│     ├─ cp_medicamentos_cmed    (medicamentos)                                         │
+│     ├─ cp_orientacoes_tecnicas (normativas)                                           │
+│     └─ cp_arp_cabecalhos       (atas de preço)                                        │
+│                                                                                         │
+│  Conexão 'pgsql_sessions' (FIXA - sessões do Laravel)                                 │
+│  └─ cp_sessions               (persistência de sessão)                                │
+│                                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                     FLUXO DE BUSCA DE PREÇOS (MODAL COTAÇÃO)                          ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│ Cliente digita "arroz 5kg" no modal de cotação                                       │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+                    JavaScript dispara 4 requisições PARALELAS
+                                    ↓
+        ┌───────────────┬──────────────┬──────────────┬──────────────┐
+        ↓               ↓              ↓              ↓              ↓
+  ┌──────────────┐ ┌─────────────┐ ┌────────────┐ ┌────────────┐
+  │    PNCP      │ │    CMED     │ │COMPRAS.GOV │ │   LOCAL    │
+  │  GET /pncp   │ │ GET /cmed   │ │GET /compras│ │GET /search │
+  └──────────────┘ └─────────────┘ └────────────┘ └────────────┘
+        ↓               ↓              ↓              ↓
+  Busca em       Busca em         API Externa    Busca em
+  ContratoPNCP   MedicamentoCmed  (dadosabertos) CatalogoProduto
+                                    +             +
+                                 CATMAT local   HistoricoPreco
+        ↓               ↓              ↓              ↓
+        └───────────────┴──────────────┴──────────────┘
+                        ↓
+            Agrupa resultados em JSON
+                        ↓
+            Exibe tabela com checkbox
+                        ↓
+        Cliente seleciona linha e clica "Salvar"
+                        ↓
+        POST /orcamentos/{id}/salvar-preco-item
+                        ↓
+        Backend: OrcamentoItem.preco_unitario = valor
+                        ↓
+        Registra em audit_log_itens
+                        ↓
+        Retorna JSON {success: true}
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║               FLUXO SANEAMENTO DE AMOSTRAS (MÉTODO DESVIO-PADRÃO)                     ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+ENTRADA: Amostras coletadas (preços)
+  Amostra 1: 10.00
+  Amostra 2: 11.50
+  Amostra 3: 12.00
+  Amostra 4: 50.00  ← Outlier (será expurgada)
+  Amostra 5: 10.50
+
+        ↓
+    EstatisticaService.aplicarSaneamentoDP()
+        ↓
+  1. Calcular média (μ) = (10 + 11.5 + 12 + 50 + 10.5) / 5 = 16.80
+     
+  2. Calcular desvio-padrão (σ) = 15.68
+  
+  3. Definir limites:
+     Limite Inferior = μ - σ = 16.80 - 15.68 = 1.12
+     Limite Superior = μ + σ = 16.80 + 15.68 = 32.48
+  
+  4. Classificar amostras:
+     ✓ Amostra 1 (10.00)  → VÁLIDA    [dentro dos limites]
+     ✓ Amostra 2 (11.50) → VÁLIDA    [dentro dos limites]
+     ✓ Amostra 3 (12.00) → VÁLIDA    [dentro dos limites]
+     ✗ Amostra 4 (50.00) → EXPURGADA [acima do limite]
+     ✓ Amostra 5 (10.50) → VÁLIDA    [dentro dos limites]
+  
+  5. Recalcular com válidas:
+     Média = (10 + 11.5 + 12 + 10.5) / 4 = 11.00
+     Mediana = 10.75
+     DP = 0.87
+     CV (Coef. Variação) = (0.87 / 11) × 100 = 7.9%
+  
+  6. Escolher método baseado em CV:
+     CV ≤ 25% → MÉDIA (usar 11.00)
+     CV > 25% → MEDIANA
+     
+        ↓
+   SAÍDA (snapshot salvo em OrcamentoItem):
+   
+   calc_n_validas = 4
+   calc_media = 11.00
+   calc_mediana = 10.75
+   calc_dp = 0.87
+   calc_cv = 7.9
+   calc_metodo = MEDIA
+   calc_lim_inf = 1.12
+   calc_lim_sup = 32.48
+   calc_hash_amostras = sha256(json([1,2,3,5]))
+   calc_carimbado_em = 2025-10-22 14:30:45
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                      FLUXO CDF (COTAÇÃO DIRETA FORNECEDOR)                           ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────┐
+│ PASSO 1: CRIAR SOLICITAÇÃO CDF      │
+└─────────────────────────────────────┘
+         Usuário preencheu:
+         - CNPJ fornecedor
+         - Razão social
+         - E-mail
+         - Itens da solicitação
+         - Prazos
+              ↓
+         POST /solicitar-cdf
+              ↓
+         Cria SolicitacaoCDF (BD)
+              ↓
+         Gera token: UUID
+         Validade: +7 dias
+              ↓
+         
+┌─────────────────────────────────────┐
+│ PASSO 2: ENVIAR EMAIL               │
+└─────────────────────────────────────┘
+         Email enviado para fornecedor
+         com link público:
+         https://{subdomain}.dattapro.online/responder-cdf/{token}
+              ↓
+
+┌─────────────────────────────────────┐
+│ PASSO 3: FORNECEDOR RESPONDE        │
+└─────────────────────────────────────┘
+         GET /responder-cdf/{token} (PÚBLICO)
+              ↓
+         Blade renderiza formulário
+              ↓
+         Fornecedor preenche:
+         - Preços dos itens
+         - Forma de pagamento
+         - Validade proposta
+              ↓
+
+┌─────────────────────────────────────┐
+│ PASSO 4: SALVAR RESPOSTA            │
+└─────────────────────────────────────┘
+         POST /api/cdf/responder (PÚBLICO)
+              ↓
+         Valida token (checksum + expiração)
+              ↓
+         Cria RespostaCDF (BD)
+         + RespostaCDFItem para cada item
+              ↓
+         Marca respondido = true
+         respondido_em = NOW()
+              ↓
+
+┌──────────────────────────────────────┐
+│ PASSO 5: USUÁRIO VISUALIZA RESPOSTA  │
+└──────────────────────────────────────┘
+         GET /cdfs-enviadas
+              ↓
+         Lista todas as respostas
+         recebidas (autenticado)
+

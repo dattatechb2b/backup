@@ -1,0 +1,528 @@
+/**
+ * MODAL DE COTAÇÃO - DESIGN MODERNO v3.0
+ * Data: 23/10/2025
+ * Redesign completo com layout profissional e elegante
+ */
+
+/* ========================================
+   VARIÁVEIS CSS
+   ======================================== */
+:root {
+    /* Cores Principais - AZUL DATTATECH */
+    --primary-color: #2c5282;
+    --primary-hover: #1e3a5f;
+    --primary-light: #dbeafe;
+
+    /* Cores Secundárias */
+    --secondary-color: #10b981;
+    --secondary-hover: #059669;
+
+    /* Cores de Fundo */
+    --bg-main: #ffffff;
+    --bg-light: #f8fafc;
+    --bg-card: #ffffff;
+
+    /* Cores de Texto */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+
+    /* Bordas */
+    --border-color: #e2e8f0;
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+    /* Espaçamento */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+}
+
+/* ========================================
+   MODAL CONTAINER
+   ======================================== */
+#modalCotacaoPrecos .modal-content {
+    background: var(--bg-light);
+    border: none;
+    border-radius: 0;
+}
+
+/* ========================================
+   HEADER MODERNO
+   ======================================== */
+#modalCotacaoPrecos .modal-header-modern {
+    background: linear-gradient(135deg, #2c5282 0%, #3b82c4 100%);
+    padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-lg);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+#modalCotacaoPrecos .modal-header-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+}
+
+#modalCotacaoPrecos .modal-title-modern {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
+}
+
+#modalCotacaoPrecos .modal-subtitle-modern {
+    color: rgba(255,255,255,0.9);
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   CARDS MODERNOS
+   ======================================== */
+.card-modern {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-color);
+}
+
+.card-modern:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-modern-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.card-modern-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    box-shadow: var(--shadow-md);
+}
+
+.card-modern-title {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.card-modern-subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin: 4px 0 0 0;
+}
+
+/* ========================================
+   INPUTS MODERNOS
+   ======================================== */
+.input-modern {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    color: var(--text-primary);
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.input-modern:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input-modern::placeholder {
+    color: var(--text-muted);
+}
+
+.input-group-modern {
+    margin-bottom: var(--spacing-lg);
+}
+
+.input-label-modern {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* ========================================
+   BOTÕES MODERNOS
+   ======================================== */
+.btn-modern {
+    padding: 14px 28px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    letter-spacing: 0.3px;
+}
+
+.btn-modern-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-modern-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-modern-primary:active {
+    transform: translateY(0);
+}
+
+.btn-modern-secondary {
+    background: white;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-modern-secondary:hover {
+    background: var(--bg-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-modern-success {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-hover) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-modern-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   TABS MODERNOS
+   ======================================== */
+.tabs-modern-container {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.tab-modern {
+    padding: 14px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: var(--spacing-sm);
+}
+
+.tab-modern:hover {
+    color: var(--primary-color);
+}
+
+.tab-modern.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* ========================================
+   TABELA MODERNA
+   ======================================== */
+.table-modern {
+    width: 100%;
+    background: white;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.table-modern thead {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.table-modern thead th {
+    padding: 16px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.table-modern tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-modern tbody tr:hover {
+    background: var(--primary-light);
+}
+
+.table-modern tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table-modern tbody td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+/* ========================================
+   BADGES MODERNOS
+   ======================================== */
+.badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.badge-modern-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+}
+
+.badge-modern-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+}
+
+.badge-modern-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+}
+
+/* ========================================
+   FILTROS LATERAIS
+   ======================================== */
+.sidebar-modern {
+    background: white;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: var(--spacing-lg);
+}
+
+.sidebar-modern-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.filter-group-modern {
+    margin-bottom: var(--spacing-lg);
+}
+
+.filter-group-modern-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* ========================================
+   ESTATÍSTICAS
+   ======================================== */
+.stats-grid-modern {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stat-card-modern {
+    flex: 1;
+    background: white;
+    border-radius: var(--border-radius-md);
+    padding: 28px 20px;
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.2s ease;
+    text-align: center;
+    min-width: 180px;
+}
+
+.stat-card-modern:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+}
+
+.stat-card-modern-label {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    text-align: center;
+    display: block;
+}
+
+.stat-card-modern-value {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--text-primary);
+    text-align: center;
+    display: block;
+    line-height: 1.2;
+}
+
+/* ========================================
+   ANIMAÇÕES
+   ======================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadein {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+.loading-modern {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    gap: var(--spacing-md);
+    width: 100%;
+    text-align: center;
+}
+
+.loading-modern-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1200px) {
+    .stats-grid-modern {
+        flex-wrap: wrap;
+    }
+
+    .stat-card-modern {
+        min-width: 120px;
+    }
+
+    .stat-card-modern-value {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-modern {
+        padding: var(--spacing-md);
+    }
+
+    .stats-grid-modern {
+        flex-direction: column !important;
+    }
+
+    .stat-card-modern {
+        min-width: 100%;
+    }
+
+    .modal-title-modern {
+        font-size: 20px;
+    }
+}

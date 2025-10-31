@@ -1,0 +1,247 @@
+# ========================================
+# .gitignore para GitHub - Cesta de Preços
+# Versão: 2.0.0
+# Data: 16/10/2025
+# ========================================
+
+# ========================================
+# LARAVEL PADRÃO
+# ========================================
+
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+
+# ========================================
+# CACHE E TEMPORÁRIOS
+# ========================================
+
+# Laravel Cache
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+/storage/framework/cache/*
+!/storage/framework/cache/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/testing/*
+!/storage/framework/testing/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+
+# Logs
+/storage/logs/*
+!/storage/logs/.gitkeep
+*.log
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ========================================
+# BANCO DE DADOS
+# ========================================
+
+*.sql
+*.sql.gz
+*.dump
+*.sqlite
+*.sqlite-journal
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# ========================================
+# UPLOADS E ARQUIVOS GERADOS
+# ========================================
+
+# Uploads de usuários (NÃO versionar)
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+
+# PDFs gerados
+/storage/app/pdfs/*
+!/storage/app/pdfs/.gitkeep
+
+# Arquivos Excel/Word temporários
+/storage/app/temp/*
+!/storage/app/temp/.gitkeep
+
+# Brasões (podem ter dados sensíveis)
+/storage/app/public/brasoes/*
+!/storage/app/public/brasoes/.gitkeep
+
+# ========================================
+# ARQUIVOS PESSOAIS/TESTES DO DESENVOLVEDOR
+# ========================================
+
+# Screenshots e imagens de teste
+/*.png
+/*.jpg
+/*.jpeg
+/*.gif
+/*.pdf
+/*.PNG
+/*.JPG
+
+# Planilhas de teste
+/*.xlsx
+/*.xls
+/*.csv
+/*.ods
+
+# Documentos de teste
+/*.docx
+/*.doc
+/*.odt
+
+# Arquivos de teste do desenvolvedor
+/test*.php
+/teste*.php
+/analisar*.php
+/cadastrar*.php
+/atualizar*.php
+
+# Prints e capturas
+/print*.png
+/Captura*.jpeg
+/completo*.png
+
+# ========================================
+# BACKUPS (NÃO versionar no GitHub)
+# ========================================
+
+/backups/
+/backup*.sh
+/restaurar*.sh
+/*.backup
+/*.bak
+
+# ========================================
+# CONFIGURAÇÕES LOCAIS
+# ========================================
+
+# Claude Code
+/.claude/
+/Arquivos_Claude/*.md
+
+# Scripts de desenvolvimento
+/fix_*.py
+/fix_*.sh
+
+# ========================================
+# NODE MODULES E BUILD
+# ========================================
+
+/node_modules/
+/npm-debug.log
+/yarn-error.log
+/yarn.lock
+/package-lock.json
+
+# Builds
+/public/build/
+/public/hot
+/public/css/app.css
+/public/js/app.js
+/public/mix-manifest.json
+
+# ========================================
+# COMPOSER
+# ========================================
+
+/vendor/
+composer.lock
+
+# ========================================
+# TABELAS CMED (MUITO GRANDES)
+# ========================================
+
+/CMED*.xlsx
+/Tabela CMED*.xlsx
+/MEDIA GERAL*.xlsx
+
+# ========================================
+# ARQUIVOS QUE DEVEM SER VERSIONADOS
+# (Garantir que estão incluídos)
+# ========================================
+
+# Manter .gitkeep em diretórios vazios
+!.gitkeep
+!**/.gitkeep
+
+# Manter .env.example (template)
+!.env.example
+
+# Manter estrutura do storage
+!/storage/app/.gitkeep
+!/storage/app/public/.gitkeep
+!/storage/framework/.gitkeep
+!/storage/framework/cache/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/testing/.gitkeep
+!/storage/framework/views/.gitkeep
+!/storage/logs/.gitkeep
+
+# Manter assets essenciais do public
+!/public/.gitkeep
+!/public/index.php
+!/public/.htaccess
+!/public/robots.txt
+!/public/favicon.ico
+
+# Manter configurações importantes
+!composer.json
+!package.json
+!.editorconfig
+!.gitattributes
+!.gitignore
+!README.md
+!LICENSE
+
+# Manter migrations e seeders
+!/database/migrations/
+!/database/seeders/
+!/database/.gitignore
+
+# Manter testes
+!/tests/
+
+# Manter configurações do Laravel
+!/config/
+
+# ========================================
+# SEGURANÇA
+# ========================================
+
+# Chaves privadas e certificados
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+
+# Arquivos de senha
+*password*
+*secret*
+*token*
+
+# Exceto exemplos/templates
+!*.example
+!*.template

@@ -1,0 +1,6 @@
+✅ Conectado ao banco de dados!
+
+❌ ERRO: Tabela cp_medicamentos_cmed não existe!
+SQLSTATE[42P01]: Undefined table: 7 ERROR:  relation "cp_medicamentos_cmed" does not exist
+LINE 1: SELECT COUNT(*) FROM cp_medicamentos_cmed
+                             ^

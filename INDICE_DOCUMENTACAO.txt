@@ -1,0 +1,544 @@
+================================================================================
+ÍNDICE COMPLETO DE DOCUMENTAÇÃO - CESTA DE PREÇOS
+================================================================================
+
+Data de Geração: 2025-10-22
+Versão: 1.0
+Analista: Claude Code
+
+================================================================================
+DOCUMENTOS PRINCIPAIS
+================================================================================
+
+1. RESUMO_EXECUTIVO.md (6KB)
+   - Visão geral da aplicação
+   - Dados de Materlandia
+   - Arquitetura técnica resumida
+   - Fluxo de negócio simplificado
+   - APIs integradas
+   - Próximos passos
+   ▸ COMECE AQUI para entender o sistema rapidamente
+
+2. RELATORIO_ANALISE_COMPLETO_2025-10-22.md (56KB)
+   - Análise MUITO DETALHADA (12 seções)
+   - Estrutura de projeto
+   - Banco de dados (49 tabelas, 52 migrations)
+   - Models (8 principais)
+   - Controllers (7 principais)
+   - Services (4 services)
+   - Routes (70+ rotas)
+   - Views (20+ arquivos Blade)
+   - Configuração multitenant
+   - Integrações externas
+   ▸ LEIA DEPOIS para entender todos os detalhes técnicos
+
+3. INDICE_DOCUMENTACAO.txt (este arquivo)
+   - Guia de navegação
+   - Estrutura de documentação
+   - Links para seções específicas
+
+================================================================================
+DOCUMENTAÇÃO TÉCNICA ADICIONAL (Em Arquivos_Claude/)
+================================================================================
+
+- CODIGO_CRITICO_NAO_MEXER.md
+  Seções do código que foram corrigidas múltiplas vezes
+  
+- RECOMENDACOES_ARQUITETURA_MULTI_TENANT.md
+  Padrões e boas práticas de multitenant
+  
+- Diversos guias de teste e análises
+
+================================================================================
+ESTRUTURA RÁPIDA DO SISTEMA
+================================================================================
+
+┌─ FRONTEND (Blade Templates) ─────────────────────────────────────────┐
+│                                                                        │
+│  resources/views/                                                     │
+│  ├── layouts/app.blade.php (Layout Principal)                        │
+│  ├── orcamentos/                                                      │
+│  │   ├── elaborar.blade.php (PÁGINA PRINCIPAL - 6 SEÇÕES)           │
+│  │   ├── pdf.blade.php (Render PDF)                                  │
+│  │   └── _modal-cotacao.blade.php (Modal de Cotação)                │
+│  ├── fornecedores.blade.php                                          │
+│  ├── catalogo.blade.php                                              │
+│  ├── pesquisa-rapida.blade.php                                       │
+│  └── cdf/ (Cotação Direta com Fornecedor)                           │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ BACKEND (Laravel) ──────────────────────────────────────────────────┐
+│                                                                        │
+│  app/                                                                  │
+│  ├── Models/ (8 principais)                                          │
+│  │   ├── Orcamento.php (Auto-numeração, relacionamentos)            │
+│  │   ├── OrcamentoItem.php (Snapshot de 16 campos)                  │
+│  │   ├── Fornecedor.php (Formatação CNPJ/CPF)                       │
+│  │   ├── SolicitacaoCDF.php (Link único por email)                  │
+│  │   ├── Orgao.php (Prefeitura/Tenant)                              │
+│  │   ├── User.php (Autenticação)                                    │
+│  │   ├── AuditLogItem.php (Auditoria)                               │
+│  │   └── OrientacaoTecnica.php (Compartilhada)                      │
+│  │                                                                    │
+│  ├── Http/Controllers/ (7 principais)                                │
+│  │   ├── OrcamentoController.php (PRINCIPAL)                        │
+│  │   ├── FornecedorController.php                                   │
+│  │   ├── CatalogoController.php                                     │
+│  │   ├── CdfRespostaController.php                                  │
+│  │   ├── ConfiguracaoController.php                                 │
+│  │   └── AuthController.php                                         │
+│  │                                                                    │
+│  ├── Services/ (4 services)                                          │
+│  │   ├── EstatisticaService.php (Saneamento, Média, Mediana)       │
+│  │   ├── CurvaABCService.php (Pareto)                               │
+│  │   ├── CnpjService.php (Validação CNPJ)                          │
+│  │   └── LicitaconService.php (Contratações similares)             │
+│  │                                                                    │
+│  └── Http/Middleware/                                                │
+│      ├── ProxyAuth.php (CRÍTICO - Autenticação multitenant)        │
+│      └── Outras validações                                           │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ BANCO DE DADOS (PostgreSQL) ───────────────────────────────────────┐
+│                                                                        │
+│  minhadattatech_db                                                   │
+│  ├── cp_* (49 tabelas com prefixo de isolamento)                    │
+│  │   ├── CORE (10): orcamentos, itens, fornecedores, cdf, users    │
+│  │   ├── CATÁLOGOS (6): catmat, cmed, catalogo, contratos, cache  │
+│  │   └── ANÁLISE (6): contratacoes, ecommerce, cotacoes, audit     │
+│  │                                                                    │
+│  ├── orientacoes_tecnicas (SEM PREFIXO - Compartilhada)            │
+│  └── (Outras tabelas de infraestrutura: migrations, etc)            │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ INTEGRAÇÕES (APIs Externas) ──────────────────────────────────────┐
+│                                                                        │
+│  1. PNCP (Portal Nacional de Compras Públicas)                      │
+│     └─ Busca ARPs com até 250 resultados                            │
+│                                                                        │
+│  2. Compras.gov (CATMAT + Preços)                                   │
+│     ├─ CATMAT local em cp_catmat (full-text search)                │
+│     └─ API de preços pagos por órgãos                              │
+│                                                                        │
+│  3. CMED (Medicamentos)                                              │
+│     └─ Tabela cp_medicamentos_cmed (importação manual)              │
+│                                                                        │
+│  4. Receita Federal (CNPJ)                                           │
+│     └─ Validação de fornecedores                                    │
+│                                                                        │
+│  5. Portal da Transparência (CGU)                                    │
+│     └─ Dados de órgãos públicos                                     │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+FLUXO PRINCIPAL DE NEGÓCIO
+================================================================================
+
+FASE 1: CRIAR ORÇAMENTO
+  → Usuário acessa /orcamentos/novo
+  → Escolhe tipo: Do zero, Copiar, Importar documento
+  → Sistema gera número: XXXXX/YYYY (ex: 00367/2025)
+  → Redireciona para /orcamentos/{id}/elaborar
+
+FASE 2: ELABORAR (Página com 6 SEÇÕES)
+  
+  SEÇÃO 1: Cabeçalho
+  ├─ Nome, número, objeto, referência externa
+  └─ Órgão interessado, status, data conclusão
+  
+  SEÇÃO 2: Metodologia
+  ├─ Método de análise crítica
+  ├─ Método de obtenção (auto/media/mediana/menor)
+  └─ Parâmetros (casas decimais, mínimo amostras, etc)
+  
+  SEÇÃO 3: Itens
+  ├─ CRUD de itens
+  ├─ Campos: Descrição, quantidade, unidade, fornecedor
+  └─ Snapshot (16 campos estatísticos)
+  
+  SEÇÃO 4: COTAÇÃO (Modal com múltiplas fontes)
+  ├─ Abrir modal → Selecionar item
+  ├─ Buscar em:
+  │  ├─ PNCP (API - ARPs)
+  │  ├─ Compras.gov (CATMAT - Catálogo + Preços)
+  │  ├─ CMED (Medicamentos)
+  │  ├─ Pesquisa Rápida (Multi-fonte)
+  │  ├─ Fornecedores Locais
+  │  └─ Cotações Externas
+  ├─ Selecionar preço
+  └─ Salvar preco_unitario
+  
+  SEÇÃO 5: CDF (Cotação Direta com Fornecedor)
+  ├─ Criar nova CDF
+  ├─ Gerar token UUID
+  ├─ Enviar email para fornecedor
+  ├─ Fornecedor responde em link público
+  └─ Validar resposta
+  
+  SEÇÃO 6: Dados do Orçamentista
+  ├─ Nome, CPF/CNPJ, Matrícula, Portaria
+  ├─ Endereço completo
+  └─ Upload de brasão
+
+FASE 3: ANÁLISE ESTATÍSTICA (Saneamento)
+  
+  Método DP (μ ± σ):
+  → Calcular média e desvio padrão
+  → Marcar amostras VALIDA ou EXPURGADA
+  → Validar mínimo (≥3 amostras)
+  → Recalcular com válidas
+  → Decidir método por CV (Coeficiente Variação)
+  → Gerar snapshot (16 campos) + hash SHA-256
+  
+  Curva ABC (Pareto):
+  → Calcular valor total por item
+  → Ordenar decrescente
+  → Classificar A (≤80%), B (80-95%), C (>95%)
+
+FASE 4: CONCLUIR
+  → Revisar todos os itens
+  → Fixar snapshots (confirmar cálculos)
+  → Marcar como "Realizado"
+  → Gerar PDF completo
+
+================================================================================
+MODELS PRINCIPAIS COM ATRIBUTOS
+================================================================================
+
+Orcamento (345 registros)
+├─ numero (auto-gerado: "XXXXX/YYYY")
+├─ nome, referencia_externa, objeto, orgao_interessado
+├─ status (pendente/realizado)
+├─ data_conclusao
+├─ metodo_juizo_critico, metodo_obtencao_preco
+├─ casas_decimais (2 ou 4)
+├─ orcamentista_* (7 campos: nome, cpf, matricula, etc)
+├─ brasao_path
+├─ usou_similares, usou_cdf, usou_ecommerce (boolean)
+└─ orgao_id
+   └─ hasMany: itens, lotes, solicitacoesCDF, coletasEcommerce
+
+OrcamentoItem (3.146 registros)
+├─ descricao, quantidade, medida_fornecimento
+├─ preco_unitario (NULL até completar cotação)
+├─ fornecedor_nome, fornecedor_cnpj
+├─ indicacao_marca, tipo
+├─ alterar_cdf (boolean)
+├─ amostras_selecionadas, justificativa_cotacao
+├─ criticas_dados
+├─ Snapshot (16 campos):
+│  ├─ calc_n_validas, calc_media, calc_mediana
+│  ├─ calc_dp, calc_cv, calc_menor, calc_maior
+│  ├─ calc_lim_inf, calc_lim_sup, calc_metodo
+│  ├─ calc_carimbado_em, calc_hash_amostras
+│  └─ (total: 16 campos)
+├─ ABC (4 campos):
+│  ├─ abc_valor_total, abc_participacao
+│  ├─ abc_acumulada, abc_classe (A/B/C)
+│  └─ (total: 4 campos)
+└─ hasMany: historicos, auditLogs, snapshots
+
+Fornecedor (3 registros em Materlandia)
+├─ tipo_documento (CNPJ/CPF)
+├─ numero_documento (sem formatação)
+├─ razao_social, nome_fantasia
+├─ dados fiscais (IE, IM)
+├─ contato (telefone, celular, email, site)
+├─ endereço (cep, logradouro, numero, complemento, bairro, cidade, uf)
+├─ campos PNCP (tags_segmento, ocorrencias, status, fonte_url, origem)
+└─ hasMany: itens
+
+SolicitacaoCDF (24 registros)
+├─ orcamento_id
+├─ Dados do fornecedor (cnpj, razao_social, email, telefone)
+├─ Justificativas (fornecedor_unico, produto_exclusivo, urgencia, etc)
+├─ Condições comerciais (prazo_resposta, prazo_entrega, frete)
+├─ Documentação (arquivo_cnpj, comprovante_path, cotacao_path)
+├─ Status (pendente/respondida/descartada/cancelada)
+├─ Sistema de resposta:
+│  ├─ token_resposta (UUID único)
+│  ├─ valido_ate (30 dias por padrão)
+│  ├─ respondido (boolean)
+│  └─ data_resposta_fornecedor
+└─ hasMany: itens, hasOne: resposta
+
+Orgao (1 registro - Materlandia)
+├─ tenant_id (20)
+├─ nome_fantasia ("Materlândia")
+├─ razao_social ("Teste Update")
+├─ Endereço completo
+├─ Contato
+├─ brasao_path, assinatura_institucional
+├─ responsavel_* (4 campos)
+└─ hasMany: orcamentos
+
+User (5 em Materlandia)
+├─ name, username, email
+├─ recovery_email
+├─ password (hash bcrypt)
+├─ role (função)
+└─ last_login_at
+
+================================================================================
+ROUTES CRÍTICAS
+================================================================================
+
+CRIAÇÃO E ELABORAÇÃO:
+GET  /orcamentos/novo                    → Formulário criação
+POST /orcamentos/novo                    → Salvar novo
+GET  /orcamentos/{id}/elaborar           → PÁGINA PRINCIPAL (6 seções)
+
+ITENS:
+POST   /orcamentos/{id}/itens            → Criar item
+PATCH  /orcamentos/{id}/itens/{item_id}  → Atualizar item
+DELETE /orcamentos/{id}/itens/{item_id}  → Remover item
+
+COTAÇÃO:
+GET  /pncp/buscar                        → AJAX busca PNCP
+GET  /compras-gov/buscar                 → AJAX busca Compras.gov
+POST /orcamentos/{id}/salvar-preco-item  → Salvar preço
+
+ANÁLISE:
+POST /orcamentos/{id}/itens/{item_id}/aplicar-saneamento  → Saneamento
+POST /orcamentos/{id}/itens/{item_id}/fixar-snapshot      → Fixar snapshot
+POST /orcamentos/{id}/calcular-e-salvar-curva-abc         → Curva ABC
+
+CDF:
+POST /orcamentos/{id}/solicitar-cdf      → Criar nova CDF
+GET  /responder-cdf/{token}              → Formulário resposta (público)
+POST /api/cdf/responder                  → Salvar resposta (público)
+
+CONCLUSÃO:
+POST /orcamentos/{id}/concluir           → Marcar realizado
+GET  /orcamentos/{id}/pdf                → Gerar PDF
+
+================================================================================
+TABELAS DO BANCO DE DADOS
+================================================================================
+
+TOTAL: 49 tabelas com prefixo "cp_"
+
+CORE (Negócio Principal):
+  cp_orcamentos              (345 registros em Materlandia)
+  cp_itens_orcamento         (3.146 registros)
+  cp_lotes                   (Agrupamento de itens)
+  cp_fornecedores            (3 registros)
+  cp_solicitacoes_cdf        (24 registros)
+  cp_respostas_cdf           (Respostas de CDFs)
+  cp_orgaos                  (1 registro - Materlandia)
+  cp_users                   (5 usuários)
+  cp_notificacoes            (Sistema de notificações)
+  cp_sessions                (Sessões persistentes)
+
+CATÁLOGOS:
+  cp_catmat                  (CATMAT do Compras.gov)
+  cp_medicamentos_cmed       (CMED)
+  cp_catalogo_produtos       (Local)
+  cp_contratos_pncp          (ARPs)
+  cp_historico_precos        (Preços coletados)
+  cp_consultas_pncp_cache    (Cache PNCP)
+
+ANÁLISE:
+  cp_contratacoes_similares  (Similares)
+  cp_coletas_ecommerce       (Ecommerce)
+  cp_cotacoes_externas       (Externas)
+  cp_audit_log_itens         (Auditoria)
+  cp_audit_snapshots         (Snapshots)
+  cp_anexos                  (Arquivos)
+
+INFRAESTRUTURA:
+  cp_cache, cp_cache_locks
+  cp_jobs, cp_job_batches, cp_failed_jobs
+  cp_password_reset_tokens
+  cp_migrations
+  E mais tabelas de infraestrutura...
+
+================================================================================
+SERVICES (LÓGICA DE NEGÓCIO)
+================================================================================
+
+EstatisticaService
+├─ aplicarSaneamentoDP(amostras, metodo, casasDecimais)
+│  └─ Retorna: amostras marcadas + snapshot (16 campos)
+├─ aplicarSaneamentoMedianaPercentual(amostras, percInf, percSup)
+├─ media(), mediana(), desvioPadraoPopulacional()
+└─ desvioPadraoAmostral()
+
+CurvaABCService
+├─ calcularCurvaABC(orcamento, limites=[80, 95])
+│  └─ Atualiza cada OrcamentoItem com: abc_*
+
+CnpjService
+├─ consultar(cnpj)     → Busca dados CNPJ
+└─ validar(cnpj)       → Valida formato
+
+LicitaconService
+└─ Busca contratações similares
+
+================================================================================
+AUTENTICAÇÃO E SEGURANÇA
+================================================================================
+
+FLUXO AUTENTICAÇÃO:
+  Proxy (MinhaDattaTech)
+    ↓
+  Headers: X-Tenant-*, X-User-*, X-DB-*
+    ↓
+  ProxyAuth Middleware
+    ├─ Verifica sessão existente
+    ├─ Configura conexão dinâmica do banco
+    ├─ Cria/autentica usuário (firstOrCreate)
+    ├─ Salva context em sessão
+    └─ Registra logs detalhados
+    ↓
+  Request continua autenticado
+
+ISOLAMENTO MULTITENANT:
+  ✓ Prefixo "cp_" em todas as 49 tabelas
+  ✓ Campo tenant_id em tabelas compartilhadas
+  ✓ ProxyAuth reconfigura BD a cada requisição
+  ✓ Sessão persistente com tenant_id e user_id
+  ✓ Headers validados a cada request
+
+PROTEÇÃO CSRF:
+  ✗ DESABILITADO para /orcamentos/*, /fornecedores/*, etc
+  ✓ ProxyAuth é autenticação principal
+  ✓ Headers X-* validam origem do proxy
+
+================================================================================
+DADOS ESPECÍFICOS DE MATERLANDIA
+================================================================================
+
+Tenant ID:                  20
+Nome da Prefeitura:         Materlândia
+URL de Acesso:             http://materlandia.example.com/module-proxy/price_basket
+Banco de Dados:            minhadattatech_db (compartilhado)
+Prefixo de Tabelas:        cp_
+
+ESTATÍSTICAS:
+├─ Orçamentos:            345 (últimos: 00367, 00366, 00365)
+├─ Itens:                 3.146 (média ~9 por orçamento)
+├─ Fornecedores:          3 cadastrados
+├─ CDFs:                  24 solicitações
+├─ Usuários:              5 usuários
+└─ Status:                OPERACIONAL
+
+FORNECEDORES LOCAIS:
+1. DATTA TECH CONSULTORIA E INOVACAO B2B LTDA (58003493000101) - Barbacena/MG
+2. ARIADNE BERTULINO (45898190000144) - Barbacena/MG
+3. VINICIUS DA CUNHA RODRIGUES (62270909000117) - Barbacena/MG (CDF respondida)
+
+ÓRGÃO:
+├─ ID:                1
+├─ Tenant ID:         20
+├─ Nome Fantasia:     "Materlândia"
+├─ Razão Social:      "Teste Update"
+├─ CNPJ:              (vazio)
+├─ Endereço:          (vazio)
+├─ Brasão:            (não configurado)
+├─ Responsável:       (não configurado)
+└─ Assinatura:        (não configurada)
+
+================================================================================
+PRÓXIMAS SEÇÕES RECOMENDADAS PARA LEITURA
+================================================================================
+
+1. RESUMO_EXECUTIVO.md
+   ▸ Leia primeiro para entender o negócio e arquitetura geral
+
+2. RELATORIO_ANALISE_COMPLETO_2025-10-22.md (SEÇÕES)
+   
+   Seção 1: Estrutura Geral do Projeto
+   └─ Arquitetura, config, bootstrap
+   
+   Seção 2: Banco de Dados e Migrations
+   └─ 49 tabelas, 52 migrations, schema
+   
+   Seção 3: Models e Relacionamentos
+   └─ 8 models principais com detalhes
+   
+   Seção 4: Controllers e Lógica de Negócio
+   └─ 7 controllers com todos os métodos
+   
+   Seção 5: Services
+   └─ 4 services (Estatística, ABC, CNPJ, LicitaCon)
+   
+   Seção 6: Routes
+   └─ 70+ rotas agrupadas por funcionalidade
+   
+   Seção 7: Views e Frontend
+   └─ Blade templates, layouts, assets, JavaScript
+   
+   Seção 8: Configuração de Multitenant
+   └─ ProxyAuth, isolamento, fluxo de requisição
+   
+   Seção 9: Integrações Externas
+   └─ PNCP, Compras.gov, CMED, Receita Federal, CGU
+   
+   Seção 10: Dados Específicos de Materlandia
+   └─ Estatísticas do tenant
+
+3. Arquivos_Claude/ (Documentação Técnica)
+   ▸ Análises críticas, recomendações, guias de teste
+
+================================================================================
+DICAS DE NAVEGAÇÃO
+================================================================================
+
+PARA ENTENDER O FLUXO:
+  1. Leia RESUMO_EXECUTIVO.md > Fluxo de Negócio
+  2. Leia RELATORIO completo > Seção 4 (Controllers)
+  3. Visualize routes em > Seção 6 (Routes)
+
+PARA ADICIONAR NOVA FEATURE:
+  1. Criar Migration (database/migrations/)
+  2. Criar Model (app/Models/)
+  3. Criar Controller (app/Http/Controllers/)
+  4. Adicionar routes (routes/web.php)
+  5. Criar views (resources/views/)
+
+PARA ENTENDER MULTITENANT:
+  1. Leia ProxyAuth (app/Http/Middleware/ProxyAuth.php)
+  2. Leia Seção 8 do RELATORIO (Configuração)
+  3. Verifique Orgao Model (app/Models/Orgao.php)
+
+PARA DEBUGAR PROBLEMAS:
+  1. Verifique logs em storage/logs/
+  2. Verifique ProxyAuth logs (headers, session, bank)
+  3. Verifique audit_log_itens para rastrear alterações
+  4. Use endpoint /debug-orcamento/{id} para diagnosticar
+
+================================================================================
+ARQUIVOS MAIS IMPORTANTES
+================================================================================
+
+┌─ BACKEND ─────────────────────────────────────────────────────────────┐
+│                                                                        │
+│  app/Http/Middleware/ProxyAuth.php              MUITO CRÍTICO        │
+│  app/Http/Controllers/OrcamentoController.php   CONTROLADOR PRINCIPAL│
+│  app/Models/Orcamento.php                       MODEL CENTRAL        │
+│  app/Models/OrcamentoItem.php                   DADOS ESTATÍSTICOS  │
+│  app/Services/EstatisticaService.php            ANÁLISE ESTATÍSTICA │
+│  routes/web.php                                 DEFINIÇÃO DE ROTAS   │
+│  bootstrap/app.php                              CONFIGURAÇÃO        │
+│  config/database.php                            CONEXÕES BANCO      │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ FRONTEND ────────────────────────────────────────────────────────────┐
+│                                                                        │
+│  resources/views/layouts/app.blade.php          LAYOUT PRINCIPAL    │
+│  resources/views/orcamentos/elaborar.blade.php  PÁGINA PRINCIPAL    │
+│  resources/views/orcamentos/_modal-cotacao.blade.php MODAL         │
+│  public/js/modal-cotacao.js                     JAVASCRIPT 112KB    │
+│  public/js/sistema-logs.js                      LOGS DO NAVEGADOR  │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+FIM DO ÍNDICE
+================================================================================

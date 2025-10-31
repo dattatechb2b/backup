@@ -1,0 +1,67 @@
+╔════════════════════════════════════════════════════════════╗
+║  IMPORTAÇÃO CMED - JULHO 2025 (DADOS MAIS RECENTES)       ║
+╚════════════════════════════════════════════════════════════╝
+
+✅ Conectado ao banco!
+📊 Registros antes: 0
+
+📂 Arquivo: Tabela CMED Julho 25 - SimTax.xlsx
+📦 Tamanho: 11.41 MB
+⏳ Carregando arquivo... (pode demorar 1-2 minutos)
+
+✅ Arquivo carregado!
+📊 Linhas: 26051 | Colunas: BW
+
+✅ Cabeçalho (linha 5 - padrão SimTax)
+
+🗺️  Mapeando colunas...
+✅ Colunas mapeadas: 10
+   - substancia, cnpj, laboratorio, ean, produto, pmc_0, pmc_12, pmc_17, pmc_18, pmc_20
+
+🚀 Iniciando importação de JULHO 2025...
+
+   ⏳ 1000/26051 (3.8%) | Inseridos: 995 | Erros: 0 | Vel: 1062/s
+   ⏳ 2000/26051 (7.7%) | Inseridos: 1995 | Erros: 0 | Vel: 940/s
+   ⏳ 3000/26051 (11.5%) | Inseridos: 2995 | Erros: 0 | Vel: 891/s
+   ⏳ 4000/26051 (15.4%) | Inseridos: 3995 | Erros: 0 | Vel: 871/s
+   ⏳ 5000/26051 (19.2%) | Inseridos: 4995 | Erros: 0 | Vel: 835/s
+   ⏳ 6000/26051 (23%) | Inseridos: 5995 | Erros: 0 | Vel: 816/s
+   ⏳ 7000/26051 (26.9%) | Inseridos: 6995 | Erros: 0 | Vel: 787/s
+   ⏳ 8000/26051 (30.7%) | Inseridos: 7995 | Erros: 0 | Vel: 777/s
+   ⏳ 9000/26051 (34.5%) | Inseridos: 8995 | Erros: 0 | Vel: 773/s
+   ⏳ 10000/26051 (38.4%) | Inseridos: 9995 | Erros: 0 | Vel: 768/s
+   ⏳ 11000/26051 (42.2%) | Inseridos: 10995 | Erros: 0 | Vel: 759/s
+   ⏳ 12000/26051 (46.1%) | Inseridos: 11995 | Erros: 0 | Vel: 761/s
+   ⏳ 13000/26051 (49.9%) | Inseridos: 12995 | Erros: 0 | Vel: 758/s
+   ⏳ 14000/26051 (53.7%) | Inseridos: 13995 | Erros: 0 | Vel: 750/s
+   ⏳ 15000/26051 (57.6%) | Inseridos: 14995 | Erros: 0 | Vel: 749/s
+   ⏳ 16000/26051 (61.4%) | Inseridos: 15995 | Erros: 0 | Vel: 737/s
+   ⏳ 17000/26051 (65.3%) | Inseridos: 16995 | Erros: 0 | Vel: 733/s
+   ⏳ 18000/26051 (69.1%) | Inseridos: 17995 | Erros: 0 | Vel: 734/s
+   ⏳ 19000/26051 (72.9%) | Inseridos: 18995 | Erros: 0 | Vel: 736/s
+   ⏳ 20000/26051 (76.8%) | Inseridos: 19995 | Erros: 0 | Vel: 730/s
+   ⏳ 21000/26051 (80.6%) | Inseridos: 20995 | Erros: 0 | Vel: 729/s
+   ⏳ 22000/26051 (84.4%) | Inseridos: 21995 | Erros: 0 | Vel: 730/s
+   ⏳ 23000/26051 (88.3%) | Inseridos: 22995 | Erros: 0 | Vel: 730/s
+   ⏳ 24000/26051 (92.1%) | Inseridos: 23995 | Erros: 0 | Vel: 735/s
+   ⏳ 25000/26051 (96%) | Inseridos: 24995 | Erros: 0 | Vel: 730/s
+   ⏳ 26000/26051 (99.8%) | Inseridos: 25995 | Erros: 0 | Vel: 724/s
+
+╔════════════════════════════════════════════════════════════╗
+║  RESULTADO DA IMPORTAÇÃO - JULHO 2025                      ║
+╚════════════════════════════════════════════════════════════╝
+
+✅ Medicamentos inseridos: 26046
+⚠️  Erros: 0
+⏭️  Linhas vazias: 0
+⏱️  Tempo total: 36.52s (0.6 minutos)
+🚀 Velocidade média: 713 registros/segundo
+
+📊 Total no banco: 26046 (antes: 0)
+📈 Novos registros: 26046
+
+💊 Medicamentos com preço (PMC 0%): 26046
+📅 Referência: Julho 2025 (dados mais recentes disponíveis)
+
+✅ Importação de JULHO 2025 concluída com sucesso!
+💊 Preços atualizados e prontos para uso no sistema!
